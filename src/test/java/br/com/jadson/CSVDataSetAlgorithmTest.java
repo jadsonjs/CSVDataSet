@@ -1,3 +1,29 @@
+/*
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ *
+ * CSVDataSet
+ * br.com.jadson
+ * CSVDataSetAlgorithmTest
+ * 25/02/20
+ */
 package br.com.jadson;
 
 import org.junit.jupiter.api.Assertions;
@@ -10,7 +36,12 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class CSVDataSetAlgorithmTest {
+/**
+ * Test creation of data in CSV file
+ *
+ * Jadson Santos - jadsonjs@gmail.com
+ */
+public class CSVDataSetAlgorithmTest {
 
     /**
      * Test sum a row or a column
@@ -144,7 +175,37 @@ class CSVDataSetAlgorithmTest {
 
         List<String> normalizedValues =  Arrays.asList(new String[]{"0.48718", "0.23077", "0.03077", "0.00000", "0.17949", "0.69231", "1.00000"});
 
+        dataSet.print();
+
         Assertions.assertTrue( normalizedRowValues.equals(dataSet.getColumnValues(0)) );
         Assertions.assertTrue (normalizedRowValues.equals( normalizedValues ));
+    }
+
+
+
+    /**
+     * Test column normalization without Replase
+     *
+     * @throws IOException
+     */
+    @Test
+    void columnNormalizationWithoutReplaceAlgorithmTest() throws IOException {
+
+        CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
+
+        dataSet.clearData();
+        dataSet.setHeaders( Arrays.asList(new String[]{"Column1"}) );
+        dataSet.addColumn(  Arrays.asList(new String[]{"100", "50", "11", "5", "40", "140", "200"})   );
+
+        List<String> noNormalizedValues =  Arrays.asList(new String[]{"100", "50", "11", "5", "40", "140", "200"});
+        List<String> normalizedValues =  Arrays.asList(new String[]{"0.48718", "0.23077", "0.03077", "0.00000", "0.17949", "0.69231", "1.00000"});
+
+
+        List<String> normalizedRowValues = dataSet.normalizeColumn(0, false);
+
+        dataSet.print();
+
+        Assertions.assertTrue (normalizedRowValues.equals( normalizedValues ));
+        Assertions.assertTrue( noNormalizedValues.equals(dataSet.getColumnValues(0)) );
     }
 }

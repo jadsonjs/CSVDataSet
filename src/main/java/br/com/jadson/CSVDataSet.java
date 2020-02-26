@@ -127,6 +127,9 @@ public class CSVDataSet {
      * Load the file data to memory
      */
     public void loadData() {
+
+        initializeRowAndColumns();
+
         try{
 
             FileReader reader = new FileReader(fileName);
@@ -236,15 +239,19 @@ public class CSVDataSet {
 
         initializeRowAndColumns();
 
+        int rowNumber = rows.size();
+        while(containsRow(rowNumber))
+            rowNumber++;
+
         // in row N of CSV file I have all this values
-        rows.add( new CSVRecord(CSVRecord.CSVRecordType.ROW, (rows.size()), rowValues) );
+        rows.add( new CSVRecord(CSVRecord.CSVRecordType.ROW, rowNumber, new ArrayList<String>( rowValues) ) );
 
         // add each value for all columns in the end
         int columnNumber = 0;
-        for (String colunmValue : rowValues) {
+        for (String columnValue : rowValues) {
             if( ! containsColumn(columnNumber) )
                 columns.add(new CSVRecord(CSVRecord.CSVRecordType.COLUMN, columnNumber));
-            columns.get(columnNumber).addValue(colunmValue);
+            columns.get(columnNumber).addValue(columnValue);
             columnNumber++;
         }
 
@@ -281,8 +288,12 @@ public class CSVDataSet {
 
         initializeRowAndColumns();
 
+        int rowNumber = rows.size();
+        while(containsRow(rowNumber))
+            rowNumber++;
+
         // in row "position" of CSV file I have all this values
-        rows.add(position, new CSVRecord(CSVRecord.CSVRecordType.ROW, (rows.size()+1), rowValues) );
+        rows.add(position, new CSVRecord(CSVRecord.CSVRecordType.ROW, rowNumber, new ArrayList<String>( rowValues) ) );
 
         // add each value for all columns in the "position"
         int columnNumber = 0;
@@ -363,8 +374,12 @@ public class CSVDataSet {
 
         initializeRowAndColumns();
 
+        int columnNumber = columns.size();
+        while(containsColumn(columnNumber))
+            columnNumber++;
+
         // in column N of CSV file I have all this values
-        columns.add( new CSVRecord(CSVRecord.CSVRecordType.COLUMN, (columns.size()+1), columnValues) );
+        columns.add( new CSVRecord(CSVRecord.CSVRecordType.COLUMN, columnNumber, new ArrayList<String>( columnValues) ) );
 
         // add each value for all row in the last
         int rowNumber = 0;
@@ -407,8 +422,12 @@ public class CSVDataSet {
 
         initializeRowAndColumns();
 
+        int columnNumber = columns.size();
+        while(containsColumn(columnNumber))
+            columnNumber++;
+
         // in column "position" of CSV file I have all this values
-        columns.add(position, new CSVRecord(CSVRecord.CSVRecordType.COLUMN, (columns.size()+1), columnValues) );
+        columns.add(position, new CSVRecord(CSVRecord.CSVRecordType.COLUMN, columnNumber, new ArrayList(columnValues) ) );
 
         // add each value for all row in the "position"
         int rowNumber = 0;
@@ -461,6 +480,8 @@ public class CSVDataSet {
             indexRow++;
         }
     }
+
+
 
     public int getRowCount(){ return rows != null ? rows.size() : 0 ; }
 
@@ -585,18 +606,22 @@ public class CSVDataSet {
      */
     public void print(){
 
+        System.out.println("Headers");
         System.out.println(header.getValues());
 
+        System.out.println("Row");
         for (CSVRecord row : rows){
             System.out.println("["+row.getType()+"]"+"("+row.getRecordNumber()+")"+row.getValues());
         }
 
-        for (int indexCol = 0 ; indexCol < columns.size(); indexCol++) {
-            System.out.print("[COLUMN]" + "(" + indexCol + ")");
-            for (CSVRecord column : columns) {
-                System.out.println(column.getValues().get(indexCol)+" ");
+        System.out.println("Columns");
+        for (CSVRecord column : columns) {
+            System.out.println("["+column.getType()+"]"+"("+column.getRecordNumber()+")");
+            for (String value : column.getValues()) {
+                System.out.println(value + " ");
             }
         }
+
     }
 
 
@@ -640,24 +665,24 @@ public class CSVDataSet {
     }
 
     private void validatedRowSize(List<String> rowValues) {
-        if (rowValues.size() != columns.size() ) {
-            throw new IllegalArgumentException("Invalid number of rows elements. Allow: "  + columns.size());
-        }
-
-        if (rowValues.size() != header.getValues().size() ) {
-            throw new IllegalArgumentException("Invalid number of columns elements. Not same of headers elements: "  + header.getValues().size());
-        }
+//        if (rowValues.size() != columns.size() ) {
+//            throw new IllegalArgumentException("Invalid number of rows elements. Allow: "  + columns.size());
+//        }
+//
+//        if (rowValues.size() != header.getValues().size() ) {
+//            throw new IllegalArgumentException("Invalid number of columns elements. Not same of headers elements: "  + header.getValues().size());
+//        }
 
     }
 
     private void validatedColumnSize(List<String> columnValues) {
-        if (columnValues.size() != rows.size()) {
-            throw new IllegalArgumentException("Invalid number of columns elements. Allow: "  + rows.size());
-        }
-
-        if (columns.size() != header.getValues().size() ) {
-            throw new IllegalArgumentException("Invalid number of columns elements. Not same of headers elements: "  + header.getValues().size());
-        }
+//        if (columnValues.size() != rows.size()) {
+//            throw new IllegalArgumentException("Invalid number of columns elements. Allow: "  + rows.size());
+//        }
+//
+//        if (columnValues.size() != header.getValues().size() ) {
+//            throw new IllegalArgumentException("Invalid number of columns elements. Not same of headers elements: "  + header.getValues().size());
+//        }
     }
 
 }

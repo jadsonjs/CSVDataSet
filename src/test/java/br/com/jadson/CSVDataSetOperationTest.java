@@ -21,7 +21,7 @@
  *
  * CSVDataSet
  * br.com.jadson
- * CSVDataSetBerefeTest
+ * CSVDataSetOperationTest
  * 25/02/20
  */
 package br.com.jadson;
@@ -31,6 +31,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Test creation of data in CSV file
@@ -40,10 +41,10 @@ import java.util.Arrays;
 public class CSVDataSetOperationTest {
 
     /**
-     * Test get a row that not exit
+     * Test build a CSV file adding row
      */
     @Test
-    void getAddRow() throws IOException {
+    void addRowTest() throws IOException {
 
         CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
 
@@ -58,6 +59,154 @@ public class CSVDataSetOperationTest {
         Assertions.assertEquals( 3, dataSet.getRowCount() );
         Assertions.assertEquals( 4, dataSet.getColumnsCount() );
     }
+
+
+    /**
+     * Test build a CSV file adding column
+     */
+    @Test
+    void addColumnTest() throws IOException {
+
+        CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
+
+        dataSet.clearData();
+        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3"}) );
+        dataSet.addColumn(  Arrays.asList(new String[]{"1", "2", "3", "4"})   );
+        dataSet.addColumn(  Arrays.asList(new String[]{"5", "6", "7", "8"})    );
+        dataSet.addColumn(  Arrays.asList(new String[]{"9", "10", "11", "12"}) );
+
+        dataSet.print();
+
+        Assertions.assertEquals( 4, dataSet.getRowCount() );
+        Assertions.assertEquals( 3, dataSet.getColumnsCount() );
+    }
+
+
+    /**
+     * Test build a CSV add specific row
+     */
+    @Test
+    void addSpecificRowTest() throws IOException {
+
+        CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
+
+        dataSet.clearData();
+        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4"}) );
+        dataSet.addRow(  Arrays.asList(new String[]{"1", "2", "3", "4"})   );
+        dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "7", "8"})    );
+        dataSet.addRow(  Arrays.asList(new String[]{"9", "10", "11", "12"}) );
+
+        dataSet.print();
+
+        dataSet.addRow(Arrays.asList(new String[]{"10", "20", "30"})  , 2);
+
+        dataSet.print();
+
+        Assertions.assertEquals( 4, dataSet.getRowCount() );
+        Assertions.assertEquals( 4, dataSet.getColumnsCount() );
+        Assertions.assertEquals( Arrays.asList(new String[]{"10", "20", "30"}), dataSet.getRowValues(2) );
+    }
+
+
+    /**
+     * Test build a CSV add specific column
+     */
+    @Test
+    void addSpecificColumnTest() throws IOException {
+
+        CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
+
+        dataSet.clearData();
+        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4"}) );
+        dataSet.addRow(  Arrays.asList(new String[]{"1", "2", "3", "4"})   );
+        dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "7", "8"})    );
+        dataSet.addRow(  Arrays.asList(new String[]{"9", "10", "11", "12"}) );
+
+        dataSet.print();
+
+        dataSet.addColumn(Arrays.asList(new String[]{"10", "20", "30"})  , 3);
+
+        dataSet.print();
+
+        Assertions.assertEquals( 3, dataSet.getRowCount() );
+        Assertions.assertEquals( 5, dataSet.getColumnsCount() );
+    }
+
+
+    /**
+     * Test remove row
+     */
+    @Test
+    void removeRowTest() throws IOException {
+
+        CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
+
+        dataSet.clearData();
+        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4"}) );
+        dataSet.addRow(  Arrays.asList(new String[]{"1", "2", "3", "4"})   );
+        dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "7", "8"})    );
+        dataSet.addRow(  Arrays.asList(new String[]{"9", "10", "11", "12"}) );
+
+        dataSet.print();
+
+        dataSet.removeRow(1);
+
+        dataSet.print();
+
+        Assertions.assertEquals( 2, dataSet.getRowCount() );
+        Assertions.assertEquals( 4, dataSet.getColumnsCount() );
+        Assertions.assertEquals( Arrays.asList(new String[]{"9", "10", "11", "12"}), dataSet.getRowValues(1) );
+    }
+
+
+    /**
+     * Test remove columns
+     */
+    @Test
+    void removeColumnTest() throws IOException {
+
+        CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
+
+        dataSet.clearData();
+        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4"}) );
+        dataSet.addRow(  Arrays.asList(new String[]{"1", "2", "3", "4"})   );
+        dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "7", "8"})    );
+        dataSet.addRow(  Arrays.asList(new String[]{"9", "10", "11", "12"}) );
+
+        dataSet.print();
+
+        dataSet.removeColumn(1);
+
+        dataSet.print();
+
+        Assertions.assertEquals( 3, dataSet.getRowCount() );
+        Assertions.assertEquals( 3, dataSet.getColumnsCount() );
+        Assertions.assertEquals( Arrays.asList(new String[]{"9", "11", "12"}), dataSet.getRowValues(2) );
+    }
+
+
+    /**
+     * Test convert values to double
+     * @throws IOException
+     */
+    @Test
+    void asDoubleTest() throws IOException {
+
+        CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
+
+        dataSet.clearData();
+        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4"}) );
+        dataSet.addRow(  Arrays.asList(new String[]{"1", "2", "3", "4"})   );
+        dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "7", "8"})    );
+        dataSet.addRow(  Arrays.asList(new String[]{"9", "10", "11", "12"}) );
+
+        List<Double> result = dataSet.getColumnValuesAsDouble(1);
+        List<Double> result2 = dataSet.getRowValuesAsDouble(1);
+
+        Assertions.assertEquals( Arrays.asList(new Double[]{2d, 6d, 10d}), result);
+        Assertions.assertEquals( Arrays.asList(new Double[]{5d, 6d, 7d, 8d}), result2);
+    }
+
 
 
     /**

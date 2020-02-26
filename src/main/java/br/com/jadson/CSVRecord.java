@@ -45,7 +45,7 @@ class CSVRecord {
     enum CSVRecordType{ ROW, COLUMN }
 
     /**
-     * The position of record inside the CSV file (can be the number of line of number of row)
+     * The id of a row or column
      */
     private int recordNumber = 0;
 
@@ -249,7 +249,7 @@ class CSVRecord {
 
     private void validatedValues() {
         if ( values== null || values.size() == 0)
-            throw new ArithmeticException("CSV " + type + " (" + recordNumber + ")" + " has no elements");
+            throw new ArithmeticException("CSV " + type + " has no elements");
     }
 
     public CSVRecordType getType() {
@@ -291,7 +291,7 @@ class CSVRecord {
 
     @Override
     public String toString() {
-        return "CSVRecord{" + "type=" + type + ", position=" + recordNumber + '}';
+        return "CSVRecord{" + "type=" + type + "}";
     }
 
 }
