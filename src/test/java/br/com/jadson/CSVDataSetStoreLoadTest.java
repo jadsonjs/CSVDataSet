@@ -31,8 +31,13 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.nio.file.FileSystems;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Test store CSV to a file and load to a file
@@ -40,7 +45,6 @@ import java.util.List;
  */
 public class CSVDataSetStoreLoadTest {
 
-    File csvFile;
 
     /**
      * Test store  and load from CSV
@@ -48,16 +52,18 @@ public class CSVDataSetStoreLoadTest {
     @Test
     void storeAndLoadDataTest() throws IOException {
 
-        csvFile = File.createTempFile("temp", ".csv");
-
         List<String> header = Arrays.asList( new String[]{"Column1", "Column2", "Column3", "Column4"});
         List<String> row1 = Arrays.asList( new String[]{"1", "2", "3", "4"} );
         List<String> row2 = Arrays.asList( new String[]{"5", "6", "7", "8"} );
         List<String> row3 = Arrays.asList( new String[]{"9", "10", "11", "12"} );
 
-        CSVDataSet dataSet = CSVDataSet.getInstance( csvFile.getName() );
+        List<String> column1 = Arrays.asList( new String[]{"1", "5", "9"} );
+        List<String> column2 = Arrays.asList( new String[]{"2", "6", "10"} );
+        List<String> column3 = Arrays.asList( new String[]{"3", "7", "11"} );
+        List<String> column4 = Arrays.asList( new String[]{"4", "8", "12"} );
 
-        dataSet.clearData();
+        CSVDataSet dataSet = new CSVDataSet( "temp"+new Random().nextInt() +".csv" );;
+
         dataSet.setHeaders(header);
         dataSet.addRow(row1);
         dataSet.addRow(row2);
@@ -68,20 +74,98 @@ public class CSVDataSetStoreLoadTest {
 
         dataSet.loadData();
 
+        List<String> row1Loaded = dataSet.getRowValues(0);
+        List<String> column1Loaded = dataSet.getColumnValues(0);
+
         List<String> row2Loaded = dataSet.getRowValues(1);
         List<String> column2Loaded = dataSet.getColumnValues(1);
 
-        List<String> column2 = Arrays.asList( new String[]{"2", "6", "10"} );
+        List<String> row3Loaded = dataSet.getRowValues(2);
+        List<String> column3Loaded = dataSet.getColumnValues(2);
+
+        List<String> column4Loaded = dataSet.getColumnValues(3);
+
+
+
+        Assertions.assertTrue(row1.equals(row1Loaded));
+        Assertions.assertTrue(column1.equals(column1Loaded));
 
         Assertions.assertTrue(row2.equals(row2Loaded));
         Assertions.assertTrue(column2.equals(column2Loaded));
 
+        Assertions.assertTrue(row3.equals(row3Loaded));
+        Assertions.assertTrue(column3.equals(column3Loaded));
+
+        Assertions.assertTrue(column4.equals(column4Loaded));
+
+        dataSet.deleteFile();
+
     }
 
-    @AfterEach
-    public void cleanUpEach(){
-        System.out.println("After Each cleanUpEach() method called");
-        if(csvFile != null ) csvFile.delete();
+
+    /**
+     * Test load a file with 1.000 lines
+     */
+    @Test
+    void loadMediumFileTest() throws IOException {
+
+        Instant start = Instant.now();
+
+        String userDirectory = FileSystems.getDefault().getPath("").toAbsolutePath().toString();
+        CSVDataSet dataSet = new CSVDataSet( userDirectory+"/src/test/resources/mediumfile.csv" );;
+        dataSet.loadData();
+
+        System.out.println("load in: "+Duration.between(start, Instant.now()).toMillis());
+
+        // the sum of all elements of column 0, is equals to 1.000
+        Assertions.assertTrue(new BigDecimal(1000).compareTo(dataSet.sumColumn(0)) == 0);
+
+        // load a file with 1.000 lines less then 1000ms or 1s
+        Assertions.assertTrue(Duration.between(start, Instant.now()).toMillis() < 1000 );
+    }
+
+    /**
+     * Test load a file with 10.000 lines
+     */
+    @Test
+    void loadBigFileTest() throws IOException {
+
+        Instant start = Instant.now();
+
+        String userDirectory = FileSystems.getDefault().getPath("").toAbsolutePath().toString();
+        CSVDataSet dataSet = new CSVDataSet( userDirectory+"/src/test/resources/bigfile.csv" );;
+        dataSet.loadData();
+
+        System.out.println("load in: "+Duration.between(start, Instant.now()).toMillis());
+
+        // the sum of all elements of column 0, is equals to 10.000
+        Assertions.assertTrue(new BigDecimal(10000).compareTo(dataSet.sumColumn(0)) == 0);
+
+        // load a file with 10.000 lines less then 1000ms or 1s
+        Assertions.assertTrue(Duration.between(start, Instant.now()).toMillis() < 1000 );
+    }
+
+
+    /**
+     * Test load a file with 100.000 lines
+     */
+    @Test
+    void loadHugeFileTest() throws IOException {
+
+        Instant start = Instant.now();
+
+        String userDirectory = FileSystems.getDefault().getPath("").toAbsolutePath().toString();
+        CSVDataSet dataSet = new CSVDataSet( userDirectory+"/src/test/resources/hugefile.csv" );;
+        dataSet.loadData();
+
+        System.out.println("load in: "+Duration.between(start, Instant.now()).toMillis());
+
+        // load a file with 100.000 lines less then 80000ms or 1m:20s
+        Assertions.assertTrue(Duration.between(start, Instant.now()).toMillis() < 80000 );
+
+        // the standard deviation of all elements of column 0, is equals to 0, because all them have the value "1"
+        Assertions.assertTrue(new BigDecimal(0).compareTo(dataSet.stdDevColumn(0)) == 0);
+
     }
 
 }

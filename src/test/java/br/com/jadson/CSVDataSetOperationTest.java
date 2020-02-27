@@ -46,7 +46,7 @@ public class CSVDataSetOperationTest {
     @Test
     void addRowTest() throws IOException {
 
-        CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
 
         dataSet.clearData();
         dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4"}) );
@@ -67,7 +67,7 @@ public class CSVDataSetOperationTest {
     @Test
     void addColumnTest() throws IOException {
 
-        CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
 
         dataSet.clearData();
         dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3"}) );
@@ -88,7 +88,7 @@ public class CSVDataSetOperationTest {
     @Test
     void addSpecificRowTest() throws IOException {
 
-        CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
 
         dataSet.clearData();
         dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4"}) );
@@ -114,7 +114,7 @@ public class CSVDataSetOperationTest {
     @Test
     void addSpecificColumnTest() throws IOException {
 
-        CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
 
         dataSet.clearData();
         dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4"}) );
@@ -139,7 +139,7 @@ public class CSVDataSetOperationTest {
     @Test
     void removeRowTest() throws IOException {
 
-        CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
 
         dataSet.clearData();
         dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4"}) );
@@ -165,7 +165,7 @@ public class CSVDataSetOperationTest {
     @Test
     void removeColumnTest() throws IOException {
 
-        CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
 
         dataSet.clearData();
         dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4"}) );
@@ -192,7 +192,7 @@ public class CSVDataSetOperationTest {
     @Test
     void asDoubleTest() throws IOException {
 
-        CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
 
         dataSet.clearData();
         dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4"}) );
@@ -215,7 +215,7 @@ public class CSVDataSetOperationTest {
     @Test
     void getRowOutIndex() throws IOException {
 
-        CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
 
         dataSet.clearData();
         dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4"}) );
@@ -237,7 +237,7 @@ public class CSVDataSetOperationTest {
     @Test
     void operationNotNumericTest() throws IOException {
 
-        CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
 
         dataSet.clearData();
         dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4"}) );

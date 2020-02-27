@@ -49,7 +49,7 @@ public class CSVDataSetAlgorithmTest {
     @Test
     void rowAndColumnSumAlgorithmTest() throws IOException {
 
-        CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
 
         dataSet.clearData();
         dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4"}) );
@@ -71,7 +71,7 @@ public class CSVDataSetAlgorithmTest {
     @Test
     void rowAndColumnMeanAlgorithmTest() throws IOException {
 
-        CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
 
         dataSet.clearData();
         dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4"}) );
@@ -94,7 +94,7 @@ public class CSVDataSetAlgorithmTest {
     @Test
     void rowAndColumnMedianAlgorithmTest() throws IOException {
 
-        CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
 
         dataSet.clearData();
         dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4"}) );
@@ -118,7 +118,7 @@ public class CSVDataSetAlgorithmTest {
     void rowAndColumnStandardDeviationAlgorithmTest() throws IOException {
 
 
-        CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
 
         dataSet.clearData();
         dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4", "Column5", "Column6", "Column7", "Column8", "Column9" }) );
@@ -141,7 +141,7 @@ public class CSVDataSetAlgorithmTest {
     @Test
     void rowNormalizationAlgorithmTest() throws IOException {
 
-        CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
 
         dataSet.clearData();
         dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4", "Column5", "Column6", "Column7"}) );
@@ -156,6 +156,42 @@ public class CSVDataSetAlgorithmTest {
         Assertions.assertTrue (normalizedRowValues.equals( normalizedValues ));
     }
 
+
+    /**
+     * Test all column normalization
+     *
+     * @throws IOException
+     */
+    @Test
+    void normalizeAllColumnAlgorithmTest() throws IOException {
+
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+
+        dataSet.clearData();
+        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4", "Column5", "Column6", "Column7"}) );
+        dataSet.addRow(  Arrays.asList(new String[]{ "100", "100", "100"}) );
+        dataSet.addRow(  Arrays.asList(new String[]{ "50",   "50",  "50"}) );
+        dataSet.addRow(  Arrays.asList(new String[]{ "11",   "11",  "11"}) );
+        dataSet.addRow(  Arrays.asList(new String[]{ "5",     "5",   "5"}) );
+        dataSet.addRow(  Arrays.asList(new String[]{ "40",   "40",  "40"}) );
+        dataSet.addRow(  Arrays.asList(new String[]{ "140", "140", "140"}) );
+        dataSet.addRow(  Arrays.asList(new String[]{ "200", "200", "200"}) );
+
+        for (int qtdColumn =0 ;  qtdColumn < dataSet.getColumnsCount() ; qtdColumn++){
+            dataSet.normalizeColumn(qtdColumn, true);
+        }
+
+        dataSet.print();
+
+        List<String> normalizedValues0 =  Arrays.asList(new String[]{"0.48718", "0.23077", "0.03077", "0.00000", "0.17949", "0.69231", "1.00000"});
+        List<String> normalizedValues1 =  Arrays.asList(new String[]{"0.48718", "0.23077", "0.03077", "0.00000", "0.17949", "0.69231", "1.00000"});
+        List<String> normalizedValues2 =  Arrays.asList(new String[]{"0.48718", "0.23077", "0.03077", "0.00000", "0.17949", "0.69231", "1.00000"});
+
+        Assertions.assertTrue( normalizedValues0.equals(dataSet.getColumnValues(0)) );
+        Assertions.assertTrue( normalizedValues1.equals(dataSet.getColumnValues(1)) );
+        Assertions.assertTrue( normalizedValues2.equals(dataSet.getColumnValues(2)) );
+    }
+
     /**
      * Test column normalization
      *
@@ -164,7 +200,7 @@ public class CSVDataSetAlgorithmTest {
     @Test
     void columnNormalizationAlgorithmTest() throws IOException {
 
-        CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
 
         dataSet.clearData();
         dataSet.setHeaders( Arrays.asList(new String[]{"Column1"}) );
@@ -191,7 +227,7 @@ public class CSVDataSetAlgorithmTest {
     @Test
     void columnNormalizationWithoutReplaceAlgorithmTest() throws IOException {
 
-        CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
 
         dataSet.clearData();
         dataSet.setHeaders( Arrays.asList(new String[]{"Column1"}) );

@@ -200,8 +200,12 @@ class CSVRecord {
         }
 
         for(String value : values) {
-            BigDecimal X = convertToBD(value);
-            normalizedValues.add(  ( X.subtract(Xmin)  ).divide(  Xmax.subtract(Xmin), 5, RoundingMode.HALF_UP ).toString() );
+            if(Xmin.compareTo(Xmax) != 0) {
+                BigDecimal X = convertToBD(value);
+                normalizedValues.add((X.subtract(Xmin)).divide(Xmax.subtract(Xmin), 5, RoundingMode.HALF_UP).toString());
+            }else{
+                normalizedValues.add( "1.00000" );
+            }
         }
 
         return normalizedValues;

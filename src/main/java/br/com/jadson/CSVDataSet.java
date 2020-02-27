@@ -61,10 +61,7 @@ public class CSVDataSet {
      */
     private String fileName = "";
 
-
-    private static CSVDataSet singleton = null;
-
-
+    /** The values of first line of CSV */
     private CSVRecord header;
 
     /************************************************************
@@ -83,10 +80,12 @@ public class CSVDataSet {
      *
      ************************************************************/
 
+
+
     @Deprecated
     private CSVDataSet(){  }
 
-    private CSVDataSet(String fileName){
+    public CSVDataSet(String fileName){
         if(fileName == null || fileName.trim().isEmpty())
             throw new IllegalArgumentException("File Name can't be null");
 
@@ -96,28 +95,13 @@ public class CSVDataSet {
         this.fileName = fileName;
     }
 
-    private CSVDataSet(String fileName, String separator){
+    public CSVDataSet(String fileName, String separator){
         this(fileName);
         if(separator == null || separator.trim().isEmpty())
             throw new IllegalArgumentException("Separator can't be null");
         this.separator = separator;
     }
 
-
-    public static CSVDataSet getInstance(String fileName){
-        if(singleton == null){
-            singleton = new CSVDataSet(fileName);
-        }
-        return singleton;
-    }
-
-
-    public static CSVDataSet getInstance(String fileName, String separator){
-        if(singleton == null){
-            singleton = new CSVDataSet(fileName, separator);
-        }
-        return singleton;
-    }
 
 
 
@@ -200,6 +184,17 @@ public class CSVDataSet {
         this.header = null;
         this.rows = null;
         this.columns = null;
+    }
+
+    public void deleteFile() {
+        try {
+            File f= new File(fileName);           //file to be delete
+            if(f.delete()){                      //returns Boolean value
+                System.out.println(f.getName() + " deleted");   //getting and printing the file name
+            } else {
+                System.out.println("failed");
+            }
+        } catch(Exception e) { e.printStackTrace(); }
     }
 
 
