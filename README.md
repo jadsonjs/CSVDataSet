@@ -22,7 +22,7 @@ CSVDataSet is a library to manipulate a DataSet stored in CSV files for Java lan
 
 #### From the binary:
 
-   CSVDataSet has a binary distribution on **libs/CSVDataSet.X.Y.jar** directory.
+   CSVDataSet has a binary distribution on **libs/csvdataset-X.Y.jar** directory.
    
    Include it on your classpath.    
     
@@ -57,17 +57,23 @@ dataSet.loadData();
 ```
 
 ```
+# Delete the CSV file
+CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
+dataSet.deleteFile();
+```
+
+```
 # Load CSV from file and Calculating the sum of a column 0 of CSV file
 CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
 dataSet.loadData();
-dataSet.sumColumn(0)
+BigDecimal sum = dataSet.sumColumn(0)
 ```
 
 ```
 # Load CSV from file and Calculating the sum of a row 0 of CSV file
 CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
 dataSet.loadData();
-dataSet.sumRow(0)
+BigDecimal sum = dataSet.sumRow(0)
 ```
 
 
@@ -75,14 +81,14 @@ dataSet.sumRow(0)
 # Load CSV from file and Calculating the mean of a column 10 of CSV file
 CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
 dataSet.loadData();
-dataSet.meanColumn(10)
+BigDecimal mean = dataSet.meanColumn(10)
 ```
 
 ```
 # Load CSV from file and Calculating the mean of a row 10 of CSV file
 CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
 dataSet.loadData();
-dataSet.meanRow(10)
+BigDecimal mean = dataSet.meanRow(10)
 ```
 
 
@@ -91,14 +97,14 @@ dataSet.meanRow(10)
 # Load CSV from file and Calculating the mean of a column 20 of CSV file
 CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
 dataSet.loadData();
-dataSet.mediaColumn(20)
+BigDecimal median = dataSet.medianColumn(20)
 ```
 
 ```
 # Load CSV from file and Calculating the mean of a row 15 of CSV file
 CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
 dataSet.loadData();
-dataSet.mediaRow(15)
+BigDecimal median = dataSet.medianRow(15)
 ```
 
 
@@ -106,30 +112,50 @@ dataSet.mediaRow(15)
 # Load CSV from file and Calculating the standard deviation of a column 100 of CSV file
 CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
 dataSet.loadData();
-dataSet.stdDevColumn(100)
+BigDecimal stdDev = dataSet.stdDevColumn(100)
 ```
 
 ```
 # Load CSV from file and Calculating the standard deviation of a row 100 of CSV file
 CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
 dataSet.loadData();
-dataSet.stdDevRow(100)
+BigDecimal stdDev = dataSet.stdDevRow(100)
 ```
 
 
 
 ```
-# Load CSV from file and Normalizing the values column 1 and update the values a of CSV file
+# Load CSV from file and normalizing the values column 1 
+# and update the values a of CSV file and save to file
 CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
 dataSet.loadData();
-dataSet.normalizeColumn(1, true)
+List<String> newColumnValues = dataSet.normalizeColumn(1, true)
+dataSet.storeData();
 ```
 
 ```
-# Load CSV from file and Normalizing the  values row 1 and update the values a of CSV file
+# Load CSV from file and normalizing the  values row 1 
+# and update the values a of CSV file and save to file
 CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
 dataSet.loadData();
-dataSet.normalizeRow(1, true)
+List<String> newRowValues = dataSet.normalizeRow(1, true)
+dataSet.storeData();
+```
+
+```
+# Load CSV from file and just normalizing the  values row 1 
+# but not update the values a of CSV file
+CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
+dataSet.loadData();
+List<String> newRowValues = dataSet.normalizeRow(1, false)
+```
+
+
+```
+# Load CSV from file and Get the values of a column 5
+CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
+dataSet.loadData();
+List<String> values = dataSet.getColumnValues(5)
 ```
 
 
@@ -137,8 +163,25 @@ dataSet.normalizeRow(1, true)
 # Load CSV from file and Get the values of a column 5 as a list of double values
 CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
 dataSet.loadData();
-dataSet.getColumnValuesAsDouble(5)
+List<Double> doubleValues = dataSet.getColumnValuesAsDouble(5)
 ```
+
+```
+# Load CSV from file and Get the values of a column 5 as a list of integer values
+CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
+dataSet.loadData();
+List<Integer> integerValues = dataSet.getColumnValuesAsInteger(5)
+```
+
+
+```
+# Load CSV from file and Get the values of a column 5 as a list of BigDecimal values
+CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
+dataSet.loadData();
+List<BigDecimal> bigDecimalValues = dataSet.getColumnValuesAsBigDecimal(5)
+```
+
+
 
 ```
 # Creating a CSV in memory, Normalizing all values and save to file.

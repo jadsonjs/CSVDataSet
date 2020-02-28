@@ -85,6 +85,10 @@ public class CSVDataSet {
     @Deprecated
     private CSVDataSet(){  }
 
+    /**
+     * Default constructor with a file name
+     * @param fileName
+     */
     public CSVDataSet(String fileName){
         if(fileName == null || fileName.trim().isEmpty())
             throw new IllegalArgumentException("File Name can't be null");
@@ -95,6 +99,11 @@ public class CSVDataSet {
         this.fileName = fileName;
     }
 
+    /**
+     * Constructor with CSV separator
+     * @param fileName
+     * @param separator
+     */
     public CSVDataSet(String fileName, String separator){
         this(fileName);
         if(separator == null || separator.trim().isEmpty())
@@ -149,7 +158,7 @@ public class CSVDataSet {
     //////////////////////// Store to a file /////////////////////////////
 
     /**
-     * Save a CSV file to disk
+     * Save a CSV data in memory to file
      */
     public void storeData(){
 
@@ -180,12 +189,18 @@ public class CSVDataSet {
 
     //////////////////////// Clear the memory data  /////////////////////////////
 
+    /**
+     * Clear all CSV data
+     */
     public void clearData() {
         this.header = null;
         this.rows = null;
         this.columns = null;
     }
 
+    /**
+     * Delete the csv file
+     */
     public void deleteFile() {
         try {
             File f= new File(fileName);           //file to be delete
@@ -201,6 +216,10 @@ public class CSVDataSet {
     //////////////////////// Create or Delete Data  /////////////////////////////
 
 
+    /**
+     * Set CSV headers values
+     * @param headers
+     */
     public void setHeaders(List<String> headers) {
         header = new CSVRecord(CSVRecord.CSVRecordType.ROW, 0, headers);
     }
@@ -487,27 +506,19 @@ public class CSVDataSet {
 
 
     public int getRowCount(){ return rows != null ? rows.size() : 0 ; }
-
     public int getColumnsCount(){ return columns != null ? columns.size() : 0 ; }
 
     public List<String> getRowValues(int rowNumber){
         return getRow(rowNumber).getValues();
     }
-
     public List<BigDecimal> getRowValuesAsBigDecimal(int rowNumber){ return getRow(rowNumber).getValuesAsBigDecimal(); }
-
     public List<Double> getRowValuesAsDouble(int rowNumber){ return getRow(rowNumber).getValuesAsDouble(); }
-
     public List<Integer> getRowValuesAsInteger(int rowNumber){ return getRow(rowNumber).getValuesAsInteger(); }
 
     public List<String> getColumnValues(int columnNumber){ return getColumn(columnNumber).getValues(); }
-
     public List<BigDecimal> getColumnValuesAsBigDecimal(int columnNumber){ return getColumn(columnNumber).getValuesAsBigDecimal(); }
-
     public List<Double> getColumnValuesAsDouble(int columnNumber){ return getColumn(columnNumber).getValuesAsDouble(); }
-
     public List<Integer> getColumnValuesAsInteger(int columnNumber){ return getColumn(columnNumber).getValuesAsInteger(); }
-
 
 
 
