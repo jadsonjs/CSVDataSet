@@ -3,6 +3,7 @@ plugins {
 }
 
 group 'org.example.jadson'
+archivesBaseName = 'csvdataset'
 version '1.0'
 
 sourceCompatibility = '11'
