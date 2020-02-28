@@ -24,7 +24,7 @@
  * CSVDataSet
  * 25/02/20
  */
-package br.com.jadson;
+package br.com.jadson.csvdataset;
 
 import java.io.*;
 import java.math.BigDecimal;
@@ -234,6 +234,8 @@ public class CSVDataSet {
 
         initializeRowAndColumns();
 
+        validatedRowSize(rowValues);
+
         int rowNumber = rows.size();
         while(containsRow(rowNumber))
             rowNumber++;
@@ -250,7 +252,7 @@ public class CSVDataSet {
             columnNumber++;
         }
 
-        validatedRowSize(rowValues);
+
     }
 
 
@@ -283,6 +285,8 @@ public class CSVDataSet {
 
         initializeRowAndColumns();
 
+        validatedRowSize(rowValues);
+
         int rowNumber = rows.size();
         while(containsRow(rowNumber))
             rowNumber++;
@@ -299,7 +303,7 @@ public class CSVDataSet {
             columnNumber++;
         }
 
-        validatedRowSize(rowValues);
+
     }
 
     /**
@@ -369,6 +373,8 @@ public class CSVDataSet {
 
         initializeRowAndColumns();
 
+        validatedColumnSize(columnValues);
+
         int columnNumber = columns.size();
         while(containsColumn(columnNumber))
             columnNumber++;
@@ -385,7 +391,7 @@ public class CSVDataSet {
             rowNumber++;
         }
 
-        validatedColumnSize(columnValues);
+
     }
 
 
@@ -417,6 +423,8 @@ public class CSVDataSet {
 
         initializeRowAndColumns();
 
+        validatedColumnSize(columnValues);
+
         int columnNumber = columns.size();
         while(containsColumn(columnNumber))
             columnNumber++;
@@ -433,7 +441,7 @@ public class CSVDataSet {
             rowNumber++;
         }
 
-        validatedColumnSize(columnValues);
+
     }
 
     /**
@@ -660,24 +668,33 @@ public class CSVDataSet {
     }
 
     private void validatedRowSize(List<String> rowValues) {
-//        if (rowValues.size() != columns.size() ) {
-//            throw new IllegalArgumentException("Invalid number of rows elements. Allow: "  + columns.size());
-//        }
-//
-//        if (rowValues.size() != header.getValues().size() ) {
-//            throw new IllegalArgumentException("Invalid number of columns elements. Not same of headers elements: "  + header.getValues().size());
-//        }
+
+        if(header == null){
+            throw new IllegalArgumentException("Invalid CSV file. No header found");
+        }
+
+        // the values need be the same size os headers values
+        // header1, header2, header3
+        // value1, value2, value3
+        if (rowValues.size() != header.getValues().size() ) {
+            throw new IllegalArgumentException("Invalid number of row elements. Not same size of headers elements: "  + header.getValues().size());
+        }
 
     }
 
     private void validatedColumnSize(List<String> columnValues) {
-//        if (columnValues.size() != rows.size()) {
-//            throw new IllegalArgumentException("Invalid number of columns elements. Allow: "  + rows.size());
-//        }
-//
-//        if (columnValues.size() != header.getValues().size() ) {
-//            throw new IllegalArgumentException("Invalid number of columns elements. Not same of headers elements: "  + header.getValues().size());
-//        }
+
+        if(header == null){
+            throw new IllegalArgumentException("Invalid CSV file. No header found");
+        }
+
+        if(columns.size() > 1){
+            // a new column needs to have the same size of first column
+            if (columnValues.size() != columns.get(0).getValues().size() ) {
+                throw new IllegalArgumentException("Invalid number of columns elements. Columns should have: "  + columns.get(0).getValues().size()+" size. ");
+            }
+        }
+
     }
 
 }

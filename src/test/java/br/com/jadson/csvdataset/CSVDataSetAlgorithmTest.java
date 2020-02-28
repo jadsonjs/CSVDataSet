@@ -24,8 +24,9 @@
  * CSVDataSetAlgorithmTest
  * 25/02/20
  */
-package br.com.jadson;
+package br.com.jadson.csvdataset;
 
+import br.com.jadson.csvdataset.CSVDataSet;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -33,8 +34,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Test creation of data in CSV file
@@ -168,7 +167,7 @@ public class CSVDataSetAlgorithmTest {
         CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
 
         dataSet.clearData();
-        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4", "Column5", "Column6", "Column7"}) );
+        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3"}) );
         dataSet.addRow(  Arrays.asList(new String[]{ "100", "100", "100"}) );
         dataSet.addRow(  Arrays.asList(new String[]{ "50",   "50",  "50"}) );
         dataSet.addRow(  Arrays.asList(new String[]{ "11",   "11",  "11"}) );

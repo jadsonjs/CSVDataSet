@@ -24,8 +24,9 @@
  * CSVDataSetOperationTest
  * 25/02/20
  */
-package br.com.jadson;
+package br.com.jadson.csvdataset;
 
+import br.com.jadson.csvdataset.CSVDataSet;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -98,13 +99,13 @@ public class CSVDataSetOperationTest {
 
         dataSet.print();
 
-        dataSet.addRow(Arrays.asList(new String[]{"10", "20", "30"})  , 2);
+        dataSet.addRow(Arrays.asList(new String[]{"10", "20", "30", "40"})  , 2);
 
         dataSet.print();
 
         Assertions.assertEquals( 4, dataSet.getRowCount() );
         Assertions.assertEquals( 4, dataSet.getColumnsCount() );
-        Assertions.assertEquals( Arrays.asList(new String[]{"10", "20", "30"}), dataSet.getRowValues(2) );
+        Assertions.assertEquals( Arrays.asList(new String[]{"10", "20", "30", "40"}), dataSet.getRowValues(2) );
     }
 
 

@@ -23,7 +23,7 @@
  * CSVRecord
  * 25/02/20
  */
-package br.com.jadson;
+package br.com.jadson.csvdataset;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -42,7 +42,7 @@ import java.util.List;
  */
 class CSVRecord {
 
-    enum CSVRecordType{ ROW, COLUMN }
+    public enum CSVRecordType{ ROW, COLUMN }
 
     /**
      * The id of a row or column

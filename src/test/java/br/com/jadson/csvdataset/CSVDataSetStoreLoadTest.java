@@ -23,13 +23,12 @@
  * CSVDataSetStoreLoadTest
  * 25/02/20
  */
-package br.com.jadson;
+package br.com.jadson.csvdataset;
 
-import org.junit.jupiter.api.AfterEach;
+import br.com.jadson.csvdataset.CSVDataSet;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.FileSystems;
