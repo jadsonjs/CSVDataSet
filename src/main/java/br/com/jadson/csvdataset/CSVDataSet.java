@@ -221,7 +221,7 @@ public class CSVDataSet {
      * @param headers
      */
     public void setHeaders(List<String> headers) {
-        header = new CSVRecord(CSVRecord.CSVRecordType.ROW, 0, headers);
+        header = new CSVRecord(CSVRecord.CSVRecordType.ROW, 0, new ArrayList<>( headers) );
     }
 
 
@@ -253,24 +253,19 @@ public class CSVDataSet {
 
         initializeRowAndColumns();
 
-        validatedRowSize(rowValues);
-
-        int rowNumber = rows.size();
-        while(containsRow(rowNumber))
-            rowNumber++;
-
         // in row N of CSV file I have all this values
-        rows.add( new CSVRecord(CSVRecord.CSVRecordType.ROW, rowNumber, new ArrayList<String>( rowValues) ) );
+        rows.add( new CSVRecord(CSVRecord.CSVRecordType.ROW, rows.size(), new ArrayList<String>( rowValues) ) );
 
         // add each value for all columns in the end
-        int columnNumber = 0;
+        int columnPosition = 0;
         for (String columnValue : rowValues) {
-            if( ! containsColumn(columnNumber) )
-                columns.add(new CSVRecord(CSVRecord.CSVRecordType.COLUMN, columnNumber));
-            columns.get(columnNumber).addValue(columnValue);
-            columnNumber++;
+            if( ! containsColumn(columnPosition) )
+                columns.add(new CSVRecord(CSVRecord.CSVRecordType.COLUMN, columnPosition));
+            columns.get(columnPosition).addValue(columnValue);
+            columnPosition++;
         }
 
+        validatedRowSize(rowValues);
 
     }
 
@@ -304,14 +299,13 @@ public class CSVDataSet {
 
         initializeRowAndColumns();
 
-        validatedRowSize(rowValues);
-
-        int rowNumber = rows.size();
-        while(containsRow(rowNumber))
-            rowNumber++;
+        for (int index = position; index < rows.size() ; index++){
+            CSVRecord record = rows.get(index);
+            record.incrementPosition();
+        }
 
         // in row "position" of CSV file I have all this values
-        rows.add(position, new CSVRecord(CSVRecord.CSVRecordType.ROW, rowNumber, new ArrayList<String>( rowValues) ) );
+        rows.add(position, new CSVRecord(CSVRecord.CSVRecordType.ROW, position, new ArrayList<String>( rowValues ) ) );
 
         // add each value for all columns in the "position"
         int columnNumber = 0;
@@ -322,6 +316,7 @@ public class CSVDataSet {
             columnNumber++;
         }
 
+        validatedRowSize(rowValues);
 
     }
 
@@ -353,6 +348,11 @@ public class CSVDataSet {
             throw new IllegalArgumentException("There is no row at position: "+position);
         }
 
+        for (int index = position+1; index < rows.size() ; index++){
+            CSVRecord record = rows.get(index);
+            record.decrementPosition();
+        }
+
         // remove a entire row at "position" of CSV
         rows.remove(position);
 
@@ -362,6 +362,7 @@ public class CSVDataSet {
             columns.get(indexColumn).getValues().remove(position);
             indexColumn++;
         }
+
     }
 
 
@@ -388,18 +389,14 @@ public class CSVDataSet {
      *
      * @param columnValues
      */
-    public void addColumn(List<String> columnValues) {
+    public void addColumn(List<String> columnValues, String headerValue) {
 
+        initializeHeader();
         initializeRowAndColumns();
 
-        validatedColumnSize(columnValues);
-
-        int columnNumber = columns.size();
-        while(containsColumn(columnNumber))
-            columnNumber++;
-
         // in column N of CSV file I have all this values
-        columns.add( new CSVRecord(CSVRecord.CSVRecordType.COLUMN, columnNumber, new ArrayList<String>( columnValues) ) );
+        columns.add( new CSVRecord(CSVRecord.CSVRecordType.COLUMN, columns.size(), new ArrayList<String>( columnValues) ) );
+        header.getValues().add(headerValue);
 
         // add each value for all row in the last
         int rowNumber = 0;
@@ -410,8 +407,11 @@ public class CSVDataSet {
             rowNumber++;
         }
 
+        validatedColumnSize(columnValues);
 
     }
+
+
 
 
     /**
@@ -438,18 +438,20 @@ public class CSVDataSet {
      * @param columnValues
      * @param position
      */
-    public void addColumn(List<String> columnValues, int position) {
+    public void addColumn(List<String> columnValues, String headerValue, int position) {
 
+        initializeHeader();
         initializeRowAndColumns();
 
-        validatedColumnSize(columnValues);
-
-        int columnNumber = columns.size();
-        while(containsColumn(columnNumber))
-            columnNumber++;
+        for (int index = position; index < columns.size() ; index++){
+            CSVRecord record = columns.get(index);
+            record.incrementPosition();
+        }
 
         // in column "position" of CSV file I have all this values
-        columns.add(position, new CSVRecord(CSVRecord.CSVRecordType.COLUMN, columnNumber, new ArrayList(columnValues) ) );
+        columns.add(position, new CSVRecord(CSVRecord.CSVRecordType.COLUMN, position, new ArrayList(columnValues) ) );
+
+        header.getValues().add(position, headerValue);
 
         // add each value for all row in the "position"
         int rowNumber = 0;
@@ -460,6 +462,7 @@ public class CSVDataSet {
             rowNumber++;
         }
 
+        validatedColumnSize(columnValues);
 
     }
 
@@ -492,6 +495,11 @@ public class CSVDataSet {
             throw new IllegalArgumentException("There is no column at position: "+position);
         }
 
+        for (int index = position+1; index < columns.size() ; index++){
+            CSVRecord record = columns.get(index);
+            record.decrementPosition();
+        }
+
         // remove entire column at "position" of CSV
         columns.remove(position);
 
@@ -501,6 +509,16 @@ public class CSVDataSet {
             rows.get(indexRow).getValues().remove(position);
             indexRow++;
         }
+
+        header.getValues().remove(position);
+    }
+
+    /**
+     * Remove a column by label
+     * @param columnLabel
+     */
+    public void removeColumn(String columnLabel) {
+        removeColumn(getColumnPositionByHeaderLabel(columnLabel));
     }
 
 
@@ -508,18 +526,24 @@ public class CSVDataSet {
     public int getRowCount(){ return rows != null ? rows.size() : 0 ; }
     public int getColumnsCount(){ return columns != null ? columns.size() : 0 ; }
 
-    public List<String> getRowValues(int rowNumber){
-        return getRow(rowNumber).getValues();
-    }
-    public List<BigDecimal> getRowValuesAsBigDecimal(int rowNumber){ return getRow(rowNumber).getValuesAsBigDecimal(); }
-    public List<Double> getRowValuesAsDouble(int rowNumber){ return getRow(rowNumber).getValuesAsDouble(); }
-    public List<Integer> getRowValuesAsInteger(int rowNumber){ return getRow(rowNumber).getValuesAsInteger(); }
+    public List<String> getRowValues(int rowPosition)                { return getRow(rowPosition).getValues(); }
+    public List<BigDecimal> getRowValuesAsBigDecimal(int rowPosition){ return getRow(rowPosition).getValuesAsBigDecimal(); }
+    public List<Double> getRowValuesAsDouble(int rowPosition)        { return getRow(rowPosition).getValuesAsDouble(); }
+    public List<Integer> getRowValuesAsInteger(int rowPosition)      { return getRow(rowPosition).getValuesAsInteger(); }
+    public List<Boolean> getRowValuesAsBoolean(int rowPosition)      { return getRow(rowPosition).getValuesAsBoolean(); }
 
-    public List<String> getColumnValues(int columnNumber){ return getColumn(columnNumber).getValues(); }
-    public List<BigDecimal> getColumnValuesAsBigDecimal(int columnNumber){ return getColumn(columnNumber).getValuesAsBigDecimal(); }
-    public List<Double> getColumnValuesAsDouble(int columnNumber){ return getColumn(columnNumber).getValuesAsDouble(); }
-    public List<Integer> getColumnValuesAsInteger(int columnNumber){ return getColumn(columnNumber).getValuesAsInteger(); }
+    public List<String> getColumnValues(int columnPosition)                { return getColumn(columnPosition).getValues(); }
+    public List<BigDecimal> getColumnValuesAsBigDecimal(int columnPosition){ return getColumn(columnPosition).getValuesAsBigDecimal(); }
+    public List<Double> getColumnValuesAsDouble(int columnPosition)        { return getColumn(columnPosition).getValuesAsDouble(); }
+    public List<Integer> getColumnValuesAsInteger(int columnPosition)      { return getColumn(columnPosition).getValuesAsInteger(); }
+    public List<Boolean> getColumnValuesAsBoolean(int columnPosition)      { return getColumn(columnPosition).getValuesAsBoolean(); }
 
+
+    public List<String> getColumnValues(String columnLabel)                { return getColumnByHeaderLabel(columnLabel).getValues(); }
+    public List<BigDecimal> getColumnValuesAsBigDecimal(String columnLabel){ return getColumnByHeaderLabel(columnLabel).getValuesAsBigDecimal(); }
+    public List<Double> getColumnValuesAsDouble(String columnLabel)        { return getColumnByHeaderLabel(columnLabel).getValuesAsDouble(); }
+    public List<Integer> getColumnValuesAsInteger(String columnLabel)      { return getColumnByHeaderLabel(columnLabel).getValuesAsInteger(); }
+    public List<Boolean> getColumnValuesAsBoolean(String columnLabel)      { return getColumnByHeaderLabel(columnLabel).getValuesAsBoolean(); }
 
 
 
@@ -527,13 +551,10 @@ public class CSVDataSet {
 
 
 
+    /// operation over column ///
+
     public BigDecimal sumColumn(int columnNumber){
         CSVRecord record = getColumn(columnNumber);
-        return record.sumValues();
-    }
-
-    public BigDecimal sumRow(int rowNumber){
-        CSVRecord record = getRow(rowNumber);
         return record.sumValues();
     }
 
@@ -542,19 +563,8 @@ public class CSVDataSet {
         return record.meanValues();
     }
 
-    public BigDecimal meanRow(int rowNumber){
-        CSVRecord record = getRow(rowNumber);
-        return record.meanValues();
-    }
-
-
     public BigDecimal medianColumn(int columnNumber){
         CSVRecord record = getColumn(columnNumber);
-        return record.medianValues();
-    }
-
-    public BigDecimal medianRow(int rowNumber){
-        CSVRecord record = getRow(rowNumber);
         return record.medianValues();
     }
 
@@ -563,36 +573,98 @@ public class CSVDataSet {
         return record.varianceValues();
     }
 
-    public BigDecimal varianceRow(int rowNumber){
-        CSVRecord record = getRow(rowNumber);
-        return record.varianceValues();
-    }
-
     public BigDecimal stdDevColumn(int columnNumber){
         CSVRecord record = getColumn(columnNumber);
-        return record.stdDevValues();
-    }
-
-    public BigDecimal stdDevRow(int rowNumber){
-        CSVRecord record = getRow(rowNumber);
         return record.stdDevValues();
     }
 
     /**
      * Normalize the CSV column values
      *
-     * @param columnNumber
+     * @param columnPosition
      * @param replace IF the old values of the column will be replaced by  normalized Values
      * @return
      */
-    public List<String> normalizeColumn(int columnNumber, boolean replace){
-        CSVRecord record = getColumn(columnNumber);
+    public List<String> normalizeColumn(int columnPosition, boolean replace){
+        CSVRecord record = getColumn(columnPosition);
         List<String> normalizedValues = record.normalizeValues();
         if(replace) {
-            removeColumn(columnNumber);
-            addColumn(normalizedValues, columnNumber);
+            String headerValue = header.getValues().get(columnPosition);
+            removeColumn(columnPosition);
+            addColumn(normalizedValues, headerValue, columnPosition);
         }
         return normalizedValues;
+    }
+
+    public BigDecimal sumColumn(String columnLabel){
+        CSVRecord record = getColumnByHeaderLabel(columnLabel);
+        return record.sumValues();
+    }
+
+    public BigDecimal meanColumn(String columnLabel){
+        CSVRecord record = getColumnByHeaderLabel(columnLabel);
+        return record.meanValues();
+    }
+
+    public BigDecimal medianColumn(String columnLabel){
+        CSVRecord record = getColumnByHeaderLabel(columnLabel);
+        return record.medianValues();
+    }
+
+    public BigDecimal varianceColumn(String columnLabel){
+        CSVRecord record = getColumnByHeaderLabel(columnLabel);
+        return record.varianceValues();
+    }
+
+    public BigDecimal stdDevColumn(String columnLabel){
+        CSVRecord record = getColumnByHeaderLabel(columnLabel);
+        return record.stdDevValues();
+    }
+
+    /**
+     * Normalize the CSV column values
+     *
+     * @param columnLabel
+     * @param replace IF the old values of the column will be replaced by  normalized Values
+     * @return
+     */
+    public List<String> normalizeColumn(String columnLabel, boolean replace){
+        CSVRecord record = getColumnByHeaderLabel(columnLabel);
+        int columnPosition = getColumnPositionByHeaderLabel(columnLabel);
+        List<String> normalizedValues = record.normalizeValues();
+        if(replace) {
+            String headerValue = header.getValues().get(columnPosition);
+            removeColumn(columnPosition);
+            addColumn(normalizedValues, headerValue, columnPosition);
+        }
+        return normalizedValues;
+    }
+
+    /// operation over row ///
+
+    public BigDecimal sumRow(int rowNumber){
+        CSVRecord record = getRow(rowNumber);
+        return record.sumValues();
+    }
+
+    public BigDecimal meanRow(int rowNumber){
+        CSVRecord record = getRow(rowNumber);
+        return record.meanValues();
+    }
+
+    public BigDecimal medianRow(int rowNumber){
+        CSVRecord record = getRow(rowNumber);
+        return record.medianValues();
+    }
+
+    public BigDecimal varianceRow(int rowNumber){
+        CSVRecord record = getRow(rowNumber);
+        return record.varianceValues();
+    }
+
+    public BigDecimal stdDevRow(int rowNumber){
+        CSVRecord record = getRow(rowNumber);
+        return record.stdDevValues();
     }
 
     /**
@@ -613,6 +685,10 @@ public class CSVDataSet {
         return normalizedValues;
     }
 
+
+
+
+
     /////////////////////////////////////////////////////////////
 
     /**
@@ -625,12 +701,12 @@ public class CSVDataSet {
 
         System.out.println("Row");
         for (CSVRecord row : rows){
-            System.out.println("["+row.getType()+"]"+"("+row.getRecordNumber()+")"+row.getValues());
+            System.out.println("["+row.getType()+"]"+"("+row.getPosition()+")"+row.getValues());
         }
 
         System.out.println("Columns");
         for (CSVRecord column : columns) {
-            System.out.println("["+column.getType()+"]"+"("+column.getRecordNumber()+")");
+            System.out.println("["+column.getType()+"]"+"("+column.getPosition()+")");
             for (String value : column.getValues()) {
                 System.out.println(value + " ");
             }
@@ -641,40 +717,86 @@ public class CSVDataSet {
 
     /////////////////////////////////////////////////////////////
 
+    /**
+     * Return the column correspondent to the header label
+     * @param columnLabel
+     * @return
+     */
+    private CSVRecord getColumnByHeaderLabel(String columnLabel){
+        int columnPosition = 0;
+        boolean find = false;
+        for(String headerLabel : header.getValues()){
+            if(headerLabel.equals(columnLabel)) {
+                find = true;
+                break;
+            }
 
-    private CSVRecord getColumn(int columnNumber){
-        if(columnNumber< 0 || columnNumber >= columns.size())
-            throw new IllegalArgumentException("Columns Number "+columnNumber+" not exits");
-        return columns.get(columnNumber);
+            columnPosition++;
+        }
+
+        if(! find) columnPosition = -1;
+
+        if(columnPosition < 0 || columnPosition >= columns.size())
+            throw new IllegalArgumentException("Column "+columnLabel+" not exits");
+
+        return columns.get(columnPosition);
     }
 
-    private CSVRecord getRow(int rowNumber){
-        if(rowNumber< 0 || rowNumber >= rows.size())
-            throw new IllegalArgumentException("Row Number "+rowNumber+" not exits");
-        return rows.get(rowNumber);
+    private int getColumnPositionByHeaderLabel(String columnLabel) {
+        int columnPosition = 0;
+        boolean find = false;
+        for (String headerLabel : header.getValues()) {
+            if (headerLabel.equals(columnLabel)) {
+                find = true;
+                break;
+            }
+
+            columnPosition++;
+        }
+        if(! find) columnPosition = -1;
+        return columnPosition;
     }
 
-    private boolean containsColumn(int columnNumber) {
+
+    private CSVRecord getColumn(int columnPosition){
+        if(columnPosition< 0 || columnPosition >= columns.size())
+            throw new IllegalArgumentException("Column Position "+columnPosition+" not exits");
+        return columns.get(columnPosition);
+    }
+
+    private CSVRecord getRow(int rowPosition){
+        if(rowPosition< 0 || rowPosition >= rows.size())
+            throw new IllegalArgumentException("Row Position "+rowPosition+" not exits");
+        return rows.get(rowPosition);
+    }
+
+    private boolean containsColumn(int position) {
         for (CSVRecord record : columns){
-            if( record.getRecordNumber() == columnNumber )
+            if( record.getPosition() == position )
                 return true;
         }
         return false;
     }
 
 
-    private boolean containsRow(int rowNumber) {
+    private boolean containsRow(int position) {
         for (CSVRecord record : rows){
-            if( record.getRecordNumber() == rowNumber )
+            if( record.getPosition() == position )
                 return true;
         }
         return false;
+    }
+
+    private void initializeHeader() {
+        if(header == null)
+            setHeaders(Arrays.asList(new String[]{}) );
     }
 
     private void initializeRowAndColumns() {
         if (rows == null || columns == null) {
             rows = new ArrayList<>();
             columns = new ArrayList<>();
+
         }
     }
 
@@ -704,6 +826,10 @@ public class CSVDataSet {
             if (columnValues.size() != columns.get(0).getValues().size() ) {
                 throw new IllegalArgumentException("Invalid number of columns elements. Columns should have: "  + columns.get(0).getValues().size()+" size. ");
             }
+        }
+
+        if(columns.size() != header.getValues().size()){
+            throw new IllegalArgumentException("Invalid number of columns elements. Columns should have same size of header labels: "  + header.getValues().size()+" size. ");
         }
 
     }

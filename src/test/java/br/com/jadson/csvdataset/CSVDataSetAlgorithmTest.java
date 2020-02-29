@@ -65,6 +65,26 @@ public class CSVDataSetAlgorithmTest {
 
 
     /**
+     * Test sum a row or a column
+     */
+    @Test
+    void columnSumAlgorithmByLabelTest() throws IOException {
+
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+
+        dataSet.clearData();
+        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4"}) );
+        dataSet.addRow(  Arrays.asList(new String[]{"1", "2", "3", "4"})   );
+        dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "7", "8"})    );
+        dataSet.addRow(  Arrays.asList(new String[]{"9", "10", "11", "12"}) );
+
+        BigDecimal sumCol = dataSet.sumColumn("Column3");
+
+        Assertions.assertTrue (new BigDecimal("21").compareTo(sumCol) == 0 );
+    }
+
+
+    /**
      * Test mean a row or a column
      */
     @Test
@@ -107,6 +127,29 @@ public class CSVDataSetAlgorithmTest {
 
         Assertions.assertTrue( new BigDecimal("10.5").compareTo(medianRow) == 0 );
         Assertions.assertTrue (new BigDecimal("8").compareTo(medianCol) == 0 );
+    }
+
+
+    /**
+     * Test median a row or a column
+     */
+    @Test
+    void rowAndColumnVarianceAlgorithmTest() throws IOException {
+
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+
+        dataSet.clearData();
+        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4"}) );
+        dataSet.addRow(  Arrays.asList(new String[]{"1", "2", "3", "4"})   );
+        dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "7", "8"})    );
+        dataSet.addRow(  Arrays.asList(new String[]{"9", "10", "11", "12"}) );
+
+
+        BigDecimal varianceRow = dataSet.varianceRow(2);
+        BigDecimal varianceCol = dataSet.varianceColumn("Column4");
+
+        Assertions.assertTrue( new BigDecimal("1.25000").compareTo(varianceRow) == 0 );
+        Assertions.assertTrue (new BigDecimal("10.66667").compareTo(varianceCol) == 0 );
     }
 
 
@@ -202,9 +245,9 @@ public class CSVDataSetAlgorithmTest {
         CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
 
         dataSet.clearData();
-        dataSet.setHeaders( Arrays.asList(new String[]{"Column1"}) );
-        dataSet.addColumn(  Arrays.asList(new String[]{"100", "50", "11", "5", "40", "140", "200"})   );
+        dataSet.addColumn(  Arrays.asList(new String[]{"100", "50", "11", "5", "40", "140", "200"}) , "Column1"  );
 
+        dataSet.print();
 
         List<String> normalizedRowValues = dataSet.normalizeColumn(0, true);
 
@@ -219,6 +262,32 @@ public class CSVDataSetAlgorithmTest {
 
 
     /**
+     * Test column normalization
+     *
+     * @throws IOException
+     */
+    @Test
+    void columnNormalizationAlgorithmByColumnValueTest() throws IOException {
+
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+
+        dataSet.clearData();
+        dataSet.addColumn(  Arrays.asList(new String[]{"100", "50", "11", "5", "40", "140", "200"}) , "Column1"  );
+
+        dataSet.print();
+
+        List<String> normalizedRowValues = dataSet.normalizeColumn("Column1", true);
+
+        List<String> normalizedValues =  Arrays.asList(new String[]{"0.48718", "0.23077", "0.03077", "0.00000", "0.17949", "0.69231", "1.00000"});
+
+        dataSet.print();
+
+        Assertions.assertTrue( normalizedRowValues.equals(dataSet.getColumnValues(0)) );
+        Assertions.assertTrue (normalizedRowValues.equals( normalizedValues ));
+    }
+
+
+    /**
      * Test column normalization without Replase
      *
      * @throws IOException
@@ -229,8 +298,7 @@ public class CSVDataSetAlgorithmTest {
         CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
 
         dataSet.clearData();
-        dataSet.setHeaders( Arrays.asList(new String[]{"Column1"}) );
-        dataSet.addColumn(  Arrays.asList(new String[]{"100", "50", "11", "5", "40", "140", "200"})   );
+        dataSet.addColumn(  Arrays.asList(new String[]{"100", "50", "11", "5", "40", "140", "200"}) , "Column1"  );
 
         List<String> noNormalizedValues =  Arrays.asList(new String[]{"100", "50", "11", "5", "40", "140", "200"});
         List<String> normalizedValues =  Arrays.asList(new String[]{"0.48718", "0.23077", "0.03077", "0.00000", "0.17949", "0.69231", "1.00000"});

@@ -42,12 +42,14 @@ import java.util.List;
  */
 class CSVRecord {
 
+
+
     public enum CSVRecordType{ ROW, COLUMN }
 
     /**
-     * The id of a row or column
+     * The position in row or column
      */
-    private int recordNumber = 0;
+    private int position = 0;
 
     /**
      * If this record is a row or column of CSV file
@@ -61,14 +63,14 @@ class CSVRecord {
     private List<String> values;
 
 
-    public CSVRecord(CSVRecordType type, int recordNumber) {
+    public CSVRecord(CSVRecordType type, int position) {
         this.type = type;
-        this.recordNumber = recordNumber;
+        this.position = position;
         this.values = new ArrayList<>();
     }
 
-    public CSVRecord(CSVRecordType type, int recordNumber, List<String> values){
-        this(type, recordNumber);
+    public CSVRecord(CSVRecordType type, int position, List<String> values){
+        this(type, position);
         this.values = values;
     }
 
@@ -221,7 +223,7 @@ class CSVRecord {
         try {
             return new BigDecimal(value);
         }catch(NumberFormatException nfe){
-            throw new NumberFormatException("CSV File has a no numeric value");
+            throw new NumberFormatException("value: \""+value+"\" of "+type+" ("+position+") is not a numeric value");
         }
     }
 
@@ -234,7 +236,7 @@ class CSVRecord {
         try {
             return Double.valueOf(value);
         }catch(NumberFormatException nfe){
-            throw new NumberFormatException("CSV File has a no numeric value");
+            throw new NumberFormatException("value: \""+value+"\" of "+type+" ("+position+") is not a numeric value");
         }
     }
 
@@ -247,8 +249,22 @@ class CSVRecord {
         try {
             return Integer.valueOf(value);
         }catch(NumberFormatException nfe){
-            throw new NumberFormatException("CSV File has a no numeric value");
+            throw new NumberFormatException("value: \""+value+"\" of "+type+" ("+position+") is not a numeric value");
         }
+    }
+
+
+    /**
+     * Convert String to Integer
+     * @param value
+     * @return
+     */
+    private Boolean convertToBoolean(String value) {
+        if("true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value) )
+            return Boolean.valueOf(value);
+        else
+            throw new NumberFormatException("value: \""+value+"\" of "+type+" ("+position+") is not a boolean value");
+
     }
 
     private void validatedValues() {
@@ -260,13 +276,23 @@ class CSVRecord {
         return type;
     }
 
-    public long getRecordNumber() {
-        return recordNumber;
+    public long getPosition() {
+        return position;
     }
 
     public List<String> getValues() {
         return values;
     }
+
+
+    public void incrementPosition() {
+        this.position++;
+    }
+
+    public void decrementPosition() {
+        this.position--;
+    }
+
 
     public List<BigDecimal> getValuesAsBigDecimal() {
         List<BigDecimal> r = new ArrayList<>();
@@ -292,10 +318,16 @@ class CSVRecord {
         return r;
     }
 
+    public List<Boolean> getValuesAsBoolean() {
+        List<Boolean> r = new ArrayList<>();
+        for (String v : values) {
+            r.add(convertToBoolean(v));
+        }
+        return r;
+    }
 
     @Override
     public String toString() {
-        return "CSVRecord{" + "type=" + type + "}";
+        return "CSVRecord{" + "position=" + position + ", type=" + type + '}';
     }
-
 }

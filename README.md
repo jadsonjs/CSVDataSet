@@ -42,10 +42,9 @@ dataSet.storeData();
 ```
 # Create a CSV by column and save to file
 CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
-dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3"}) );
-dataSet.addColumn(  Arrays.asList(new String[]{"1", "2", "3", "4"})   );
-dataSet.addColumn(  Arrays.asList(new String[]{"5", "6", "7", "8"})    );
-dataSet.addColumn(  Arrays.asList(new String[]{"9", "10", "11", "12"}) );
+dataSet.addColumn(  Arrays.asList(new String[]{"1", "2", "3", "4"})   , "Column1"  );
+dataSet.addColumn(  Arrays.asList(new String[]{"5", "6", "7", "8"})   , "Column2"  );
+dataSet.addColumn(  Arrays.asList(new String[]{"9", "10", "11", "12"}), "Column3"  );
 dataSet.storeData();
 ```
 
@@ -68,6 +67,16 @@ CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
 dataSet.loadData();
 BigDecimal sum = dataSet.sumColumn(0)
 ```
+
+
+```
+# Load CSV from file and calculating the sum of a column "Column1" of CSV dataset
+CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
+dataSet.loadData();
+BigDecimal sum = dataSet.sumColumn("Column1")
+```
+
+
 
 ```
 # Load CSV from file and Calculating the sum of a row 0 of CSV file
@@ -133,6 +142,17 @@ List<String> newColumnValues = dataSet.normalizeColumn(1, true)
 dataSet.storeData();
 ```
 
+
+```
+# Load CSV from file and normalizing the values column "Column1"
+# and update the values a of CSV file and save to file
+CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
+dataSet.loadData();
+List<String> newColumnValues = dataSet.normalizeColumn("Column1", true)
+dataSet.storeData();
+```
+
+
 ```
 # Load CSV from file and normalizing the  values row 1 
 # and update the values a of CSV file and save to file
@@ -166,6 +186,14 @@ dataSet.loadData();
 List<Double> doubleValues = dataSet.getColumnValuesAsDouble(5)
 ```
 
+
+```
+# Load CSV from file and Get the values of a column "Column1" as a list of double values
+CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
+dataSet.loadData();
+List<Double> doubleValues = dataSet.getColumnValuesAsDouble("Column1")
+```
+
 ```
 # Load CSV from file and Get the values of a column 5 as a list of integer values
 CSVDataSet dataSet = CSVDataSet.getInstance( "temp.csv" );
@@ -197,12 +225,33 @@ dataSet.addRow(  Arrays.asList(new String[]{ "40",   "40",  "40"}) );
 dataSet.addRow(  Arrays.asList(new String[]{ "140", "140", "140"}) );
 dataSet.addRow(  Arrays.asList(new String[]{ "200", "200", "200"}) );
 
-for (int qtdColumn =0 ;  qtdColumn < dataSet.getColumnsCount() ; qtdColumn++){
-    dataSet.normalizeColumn(qtdColumn, true);
+for (int positionColumn =0 ;  positionColumn < dataSet.getColumnsCount() ; positionColumn++){
+    dataSet.normalizeColumn(positionColumn, true);
 }
 
 dataSet.storeData();
 
+```
+
+
+```
+# Creating a CSV in memory, add and remove rows and columns, sum a column by label and save to file.
+
+CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3"}) );
+dataSet.addRow(  Arrays.asList(new String[]{"1", "2", "3"})  );
+dataSet.addRow(  Arrays.asList(new String[]{"4", "5", "6"}) );
+dataSet.addRow(  Arrays.asList(new String[]{"7", "8", "9"}) );
+
+dataSet.addColumn(  Arrays.asList(new String[]{"2.5", "5.5", "8.5"}), "Column2.1",  2  );
+dataSet.removeColumn("Column1");
+
+dataSet.addRow(Arrays.asList(new String[]{"100", "200", "300"}), 0);
+dataSet.removeRow(0);
+
+BigDecimal sum = dataSet.sumColumn("Column2.1") )
+
+dataSet.storeData();
 ```
 
 

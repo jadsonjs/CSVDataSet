@@ -31,6 +31,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
@@ -71,10 +72,9 @@ public class CSVDataSetOperationTest {
         CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
 
         dataSet.clearData();
-        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3"}) );
-        dataSet.addColumn(  Arrays.asList(new String[]{"1", "2", "3", "4"})   );
-        dataSet.addColumn(  Arrays.asList(new String[]{"5", "6", "7", "8"})    );
-        dataSet.addColumn(  Arrays.asList(new String[]{"9", "10", "11", "12"}) );
+        dataSet.addColumn(  Arrays.asList(new String[]{"1", "2", "3", "4"})   , "Column1"  );
+        dataSet.addColumn(  Arrays.asList(new String[]{"5", "6", "7", "8"})   , "Column2"  );
+        dataSet.addColumn(  Arrays.asList(new String[]{"9", "10", "11", "12"}), "Column3"  );
 
         dataSet.print();
 
@@ -125,7 +125,7 @@ public class CSVDataSetOperationTest {
 
         dataSet.print();
 
-        dataSet.addColumn(Arrays.asList(new String[]{"10", "20", "30"})  , 3);
+        dataSet.addColumn(Arrays.asList(new String[]{"10", "20", "30"})  , "Column5", 3);
 
         dataSet.print();
 
@@ -209,6 +209,45 @@ public class CSVDataSetOperationTest {
     }
 
 
+    /**
+     * Test convert values to boolean
+     * @throws IOException
+     */
+    @Test
+    void asBooleanTest() throws IOException {
+
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+
+        dataSet.clearData();
+        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4"}) );
+        dataSet.addRow(  Arrays.asList(new String[]{"true", "false", "true", "false"})   );
+        dataSet.addRow(  Arrays.asList(new String[]{"false", "true", "false", "true"})    );
+        dataSet.addRow(  Arrays.asList(new String[]{"true", "true", "false", "false"}) );
+
+        List<Boolean> result = dataSet.getColumnValuesAsBoolean("Column3");
+
+        Assertions.assertEquals( Arrays.asList(new Boolean[]{true, false, false}), result);
+    }
+
+
+    /**
+     * Test try convert text to boolean
+     * @throws IOException
+     */
+    @Test
+    void asBooleanExceptionTest() throws IOException {
+
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+
+        dataSet.clearData();
+        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4"}) );
+        dataSet.addRow(  Arrays.asList(new String[]{"true", "false", "true", "false"})   );
+        dataSet.addRow(  Arrays.asList(new String[]{"false", "true", "Jadson", "true"})    );
+        dataSet.addRow(  Arrays.asList(new String[]{"true", "true", "false", "false"}) );
+
+        Exception exception = Assertions.assertThrows(NumberFormatException.class, () -> { dataSet.getColumnValuesAsBoolean("Column3"); });
+        Assertions.assertEquals( "value: \"Jadson\" of COLUMN (2) is not a boolean value", exception.getMessage() );
+    }
 
     /**
      * Test get a row that not exit
@@ -226,7 +265,7 @@ public class CSVDataSetOperationTest {
 
 
         Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> { dataSet.getRowValues(3); });
-        Assertions.assertEquals( "Row Number 3 not exits", exception.getMessage() );
+        Assertions.assertEquals( "Row Position 3 not exits", exception.getMessage() );
     }
 
 
@@ -247,9 +286,49 @@ public class CSVDataSetOperationTest {
         dataSet.addRow(  Arrays.asList(new String[]{"9", "ABC", "11", "12"}) );
 
         Exception exception = Assertions.assertThrows(NumberFormatException.class, () -> { dataSet.sumRow(2); });
-        Assertions.assertEquals( "CSV File has a no numeric value", exception.getMessage() );
+        Assertions.assertEquals( "value: \"ABC\" of ROW (2) is not a numeric value", exception.getMessage() );
 
     }
 
+
+    /**
+     * Test add and remove columns and rows
+     * @throws IOException
+     */
+    @Test
+    void testOperationsAddAndRemoveColumnsAndRows() throws IOException {
+
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+
+        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3"}) );
+        dataSet.addRow(  Arrays.asList(new String[]{"1", "2", "3"})  );
+        dataSet.addRow(  Arrays.asList(new String[]{"4", "5", "6"}) );
+        dataSet.addRow(  Arrays.asList(new String[]{"7", "8", "9"}) );
+
+        dataSet.print();
+
+        dataSet.addColumn(  Arrays.asList(new String[]{"2.5", "5.5", "8.5"}), "Column2.1", 2  );
+
+        dataSet.print();
+
+        dataSet.removeColumn("Column1");
+
+        dataSet.print();
+
+        dataSet.addRow(Arrays.asList(new String[]{"100", "200", "300"}), 0);
+
+        dataSet.print();
+
+        dataSet.removeRow(0);
+
+        dataSet.print();
+
+        Assertions.assertEquals( 3, dataSet.getColumnsCount() );
+        Assertions.assertEquals( 3, dataSet.getRowCount() );
+
+        Assertions.assertTrue( new BigDecimal("16.5").compareTo(dataSet.sumColumn("Column2.1") ) == 0 );
+
+
+    }
 
 }
