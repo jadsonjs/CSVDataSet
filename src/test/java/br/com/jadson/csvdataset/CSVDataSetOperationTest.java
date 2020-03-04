@@ -185,6 +185,57 @@ public class CSVDataSetOperationTest {
         Assertions.assertEquals( Arrays.asList(new String[]{"9", "11", "12"}), dataSet.getRowValues(2) );
     }
 
+    /***
+     * Test replace a specific row os CSV
+     * @throws IOException
+     */
+    @Test
+    void replaceRowTest() throws IOException {
+
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+
+        dataSet.clearData();
+        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4"}) );
+        dataSet.addRow(  Arrays.asList(new String[]{"1", "2", "3", "4"})   );
+        dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "7", "8"})    );
+        dataSet.addRow(  Arrays.asList(new String[]{"9", "10", "11", "12"}) );
+
+        dataSet.print();
+
+        dataSet.replaceRow(0, Arrays.asList(new String[]{"10", "20", "30", "40"}));
+
+        dataSet.print();
+
+        Assertions.assertEquals( 3, dataSet.getRowCount() );
+
+        Assertions.assertEquals( Arrays.asList(new String[]{"10", "20", "30", "40"}), dataSet.getRowValues(0) );
+
+    }
+
+    /**
+     * Test replace a specific Column os CSV
+     */
+    @Test
+    void replaceColumnTest() throws IOException {
+
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+
+        dataSet.clearData();
+        dataSet.addColumn(  Arrays.asList(new String[]{"1", "2", "3", "4"})   , "Column1"  );
+        dataSet.addColumn(  Arrays.asList(new String[]{"5", "6", "7", "8"})   , "Column2"  );
+        dataSet.addColumn(  Arrays.asList(new String[]{"9", "10", "11", "12"}), "Column3"  );
+
+        dataSet.print();
+
+        dataSet.replaceColumn("Column2", Arrays.asList(new String[]{"50", "60", "70", "80"}));
+
+        dataSet.print();
+
+        Assertions.assertEquals( 3, dataSet.getColumnsCount() );
+        Assertions.assertEquals( Arrays.asList(new String[]{"50", "60", "70", "80"}), dataSet.getColumnValues("Column2") );
+    }
+
+
 
     /**
      * Test convert values to double

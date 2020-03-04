@@ -720,9 +720,7 @@ public class CSVDataSet {
         CSVRecord record = getColumn(columnPosition);
         List<String> normalizedValues = record.normalizeValues();
         if(replace) {
-            String headerValue = header.getValues().get(columnPosition);
-            removeColumn(columnPosition);
-            addColumn(normalizedValues, headerValue, columnPosition);
+            replaceColumn(columnPosition, normalizedValues);
         }
         return normalizedValues;
     }
@@ -740,13 +738,31 @@ public class CSVDataSet {
         int columnPosition = getColumnPositionByHeaderLabel(columnLabel);
         List<String> normalizedValues = record.normalizeValues();
         if(replace) {
-            String headerValue = header.getValues().get(columnPosition);
-            removeColumn(columnPosition);
-            addColumn(normalizedValues, headerValue, columnPosition);
+            replaceColumn(columnPosition, normalizedValues);
         }
         return normalizedValues;
     }
 
+    /**
+     * Replace a column of CSV file
+     * @param columnPosition
+     * @param values
+     */
+    public void replaceColumn(int columnPosition, List<String> values){
+        String headerValue = header.getValues().get(columnPosition);
+        removeColumn(columnPosition);
+        addColumn(values, headerValue, columnPosition);
+    }
+
+    /**
+     * Replace a column of CSV file
+     * @param columnLabel
+     * @param values
+     */
+    public void replaceColumn(String columnLabel, List<String> values){
+        int columnPosition =  getColumnPositionByHeaderLabel(columnLabel);
+        replaceColumn(columnPosition, values);
+    }
 
 
 
@@ -826,14 +842,21 @@ public class CSVDataSet {
         List<String> normalizedValues = record.normalizeValues();
 
         if(replace) {
-            removeRow(rowNumber);
-            addRow(normalizedValues, rowNumber);
+            replaceRow(rowNumber, normalizedValues);
         }
         return normalizedValues;
     }
 
 
-
+    /**
+     * Replace a row of CSV file
+     * @param rowNumber
+     * @param values
+     */
+    public void replaceRow(int rowNumber, List<String> values){
+        removeRow(rowNumber);
+        addRow(values, rowNumber);
+    }
 
 
     /////////////////////////////////////////////////////////////
