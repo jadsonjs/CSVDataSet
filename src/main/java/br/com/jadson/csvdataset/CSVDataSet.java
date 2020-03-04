@@ -64,6 +64,7 @@ public class CSVDataSet {
     /** The values of first line of CSV */
     private CSVRecord header;
 
+
     /************************************************************
      * Keep rows and columns of the CSV in separated list
      *
@@ -106,10 +107,11 @@ public class CSVDataSet {
      */
     public CSVDataSet(String fileName, String separator){
         this(fileName);
-        if(separator == null || separator.trim().isEmpty())
-            throw new IllegalArgumentException("Separator can't be null");
+        if(separator == null || separator.trim().isEmpty() || separator.length() != 1)
+            throw new IllegalArgumentException("Separator can't be null and have to be a character.");
         this.separator = separator;
     }
+
 
 
 
@@ -156,6 +158,8 @@ public class CSVDataSet {
 
 
     //////////////////////// Store to a file /////////////////////////////
+
+
 
     /**
      * Save a CSV data in memory to file
@@ -551,32 +555,159 @@ public class CSVDataSet {
 
 
 
-    /// operation over column ///
+
+    //////////////////////////  operation over column  //////////////////////////////////////
+
 
     public BigDecimal sumColumn(int columnNumber){
         CSVRecord record = getColumn(columnNumber);
         return record.sumValues();
     }
 
+    public BigDecimal sumColumn(String columnLabel){
+        CSVRecord record = getColumnByHeaderLabel(columnLabel);
+        return record.sumValues();
+    }
+
+    /**
+     * Operation sum column elements values in the position that match with values of a reference column.
+     *
+     * @param columnNumber
+     * @param referenceColumnLabel
+     * @param referenceColumnValue
+     * @return
+     */
+    public BigDecimal sumColumnByMatching(int columnNumber, String referenceColumnLabel, String referenceColumnValue) {
+        CSVRecord referenceColumn = getColumnByHeaderLabel(referenceColumnLabel);
+        List<Integer> indexes = referenceColumn.getIndexesOfValue(referenceColumnValue);
+        CSVRecord record = getColumn(columnNumber);
+        return record.sumValues(indexes);
+    }
+
+    public BigDecimal sumColumnByMatching(String columnLabel, String referenceColumnLabel, String referenceColumnValue) {
+        CSVRecord referenceColumn = getColumnByHeaderLabel(referenceColumnLabel);
+        List<Integer> indexes = referenceColumn.getIndexesOfValue(referenceColumnValue);
+        CSVRecord record = getColumnByHeaderLabel(columnLabel);
+        return record.sumValues(indexes);
+    }
+
+
+
+
     public BigDecimal meanColumn(int columnNumber){
         CSVRecord record = getColumn(columnNumber);
         return record.meanValues();
     }
+
+    public BigDecimal meanColumn(String columnLabel){
+        CSVRecord record = getColumnByHeaderLabel(columnLabel);
+        return record.meanValues();
+    }
+
+    public BigDecimal meanColumnByMatching(int columnNumber, String referenceColumnLabel, String referenceColumnValue) {
+        CSVRecord referenceColumn = getColumnByHeaderLabel(referenceColumnLabel);
+        List<Integer> indexes = referenceColumn.getIndexesOfValue(referenceColumnValue);
+        CSVRecord record = getColumn(columnNumber);
+        return record.meanValues(indexes);
+    }
+
+    public BigDecimal meanColumnByMatching(String columnLabel, String referenceColumnLabel, String referenceColumnValue) {
+        CSVRecord referenceColumn = getColumnByHeaderLabel(referenceColumnLabel);
+        List<Integer> indexes = referenceColumn.getIndexesOfValue(referenceColumnValue);
+        CSVRecord record = getColumnByHeaderLabel(columnLabel);
+        return record.meanValues(indexes);
+    }
+
+
+
 
     public BigDecimal medianColumn(int columnNumber){
         CSVRecord record = getColumn(columnNumber);
         return record.medianValues();
     }
 
+    public BigDecimal medianColumn(String columnLabel){
+        CSVRecord record = getColumnByHeaderLabel(columnLabel);
+        return record.medianValues();
+    }
+
+
+    public BigDecimal medianColumnByMatching(int columnNumber, String referenceColumnLabel, String referenceColumnValue) {
+        CSVRecord referenceColumn = getColumnByHeaderLabel(referenceColumnLabel);
+        List<Integer> indexes = referenceColumn.getIndexesOfValue(referenceColumnValue);
+        CSVRecord record = getColumn(columnNumber);
+        return record.medianValues(indexes);
+    }
+
+    public BigDecimal medianColumnByMatching(String columnLabel, String referenceColumnLabel, String referenceColumnValue) {
+        CSVRecord referenceColumn = getColumnByHeaderLabel(referenceColumnLabel);
+        List<Integer> indexes = referenceColumn.getIndexesOfValue(referenceColumnValue);
+        CSVRecord record = getColumnByHeaderLabel(columnLabel);
+        return record.medianValues(indexes);
+    }
+
+
+
+
+
     public BigDecimal varianceColumn(int columnNumber){
         CSVRecord record = getColumn(columnNumber);
         return record.varianceValues();
     }
 
+
+    public BigDecimal varianceColumn(String columnLabel){
+        CSVRecord record = getColumnByHeaderLabel(columnLabel);
+        return record.varianceValues();
+    }
+
+
+    public BigDecimal varianceColumnByMatching(int columnNumber, String referenceColumnLabel, String referenceColumnValue) {
+        CSVRecord referenceColumn = getColumnByHeaderLabel(referenceColumnLabel);
+        List<Integer> indexes = referenceColumn.getIndexesOfValue(referenceColumnValue);
+        CSVRecord record = getColumn(columnNumber);
+        return record.varianceValues(indexes);
+    }
+
+
+    public BigDecimal varianceColumnByMatching(String columnLabel, String referenceColumnLabel, String referenceColumnValue) {
+        CSVRecord referenceColumn = getColumnByHeaderLabel(referenceColumnLabel);
+        List<Integer> indexes = referenceColumn.getIndexesOfValue(referenceColumnValue);
+        CSVRecord record = getColumnByHeaderLabel(columnLabel);
+        return record.varianceValues(indexes);
+    }
+
+
+
+
     public BigDecimal stdDevColumn(int columnNumber){
         CSVRecord record = getColumn(columnNumber);
         return record.stdDevValues();
     }
+
+
+    public BigDecimal stdDevColumn(String columnLabel){
+        CSVRecord record = getColumnByHeaderLabel(columnLabel);
+        return record.stdDevValues();
+    }
+
+
+    public BigDecimal stdDevColumnByMatching(int columnNumber, String referenceColumnLabel, String referenceColumnValue) {
+        CSVRecord referenceColumn = getColumnByHeaderLabel(referenceColumnLabel);
+        List<Integer> indexes = referenceColumn.getIndexesOfValue(referenceColumnValue);
+        CSVRecord record = getColumn(columnNumber);
+        return record.stdDevValues(indexes);
+    }
+
+
+    public BigDecimal stdDevColumnByMatching(String columnLabel, String referenceColumnLabel, String referenceColumnValue) {
+        CSVRecord referenceColumn = getColumnByHeaderLabel(referenceColumnLabel);
+        List<Integer> indexes = referenceColumn.getIndexesOfValue(referenceColumnValue);
+        CSVRecord record = getColumnByHeaderLabel(columnLabel);
+        return record.stdDevValues(indexes);
+    }
+
+
 
     /**
      * Normalize the CSV column values
@@ -596,30 +727,6 @@ public class CSVDataSet {
         return normalizedValues;
     }
 
-    public BigDecimal sumColumn(String columnLabel){
-        CSVRecord record = getColumnByHeaderLabel(columnLabel);
-        return record.sumValues();
-    }
-
-    public BigDecimal meanColumn(String columnLabel){
-        CSVRecord record = getColumnByHeaderLabel(columnLabel);
-        return record.meanValues();
-    }
-
-    public BigDecimal medianColumn(String columnLabel){
-        CSVRecord record = getColumnByHeaderLabel(columnLabel);
-        return record.medianValues();
-    }
-
-    public BigDecimal varianceColumn(String columnLabel){
-        CSVRecord record = getColumnByHeaderLabel(columnLabel);
-        return record.varianceValues();
-    }
-
-    public BigDecimal stdDevColumn(String columnLabel){
-        CSVRecord record = getColumnByHeaderLabel(columnLabel);
-        return record.stdDevValues();
-    }
 
     /**
      * Normalize the CSV column values
@@ -640,16 +747,35 @@ public class CSVDataSet {
         return normalizedValues;
     }
 
-    /// operation over row ///
+
+
+
+    ////////////////////////////// operation over rows ////////////////////////////////////
+
 
     public BigDecimal sumRow(int rowNumber){
         CSVRecord record = getRow(rowNumber);
         return record.sumValues();
     }
 
+    public BigDecimal sumRowByMatching(int rowNumber, int referenceRowNumber, String referenceRowValue) {
+        CSVRecord referenceRow = getRow(referenceRowNumber);
+        List<Integer> indexes = referenceRow.getIndexesOfValue(referenceRowValue);
+        CSVRecord record = getRow(rowNumber);
+        return record.sumValues(indexes);
+    }
+
+
     public BigDecimal meanRow(int rowNumber){
         CSVRecord record = getRow(rowNumber);
         return record.meanValues();
+    }
+
+    public BigDecimal meanRowByMatching(int rowNumber, int referenceRowNumber, String referenceRowValue) {
+        CSVRecord referenceRow = getRow(referenceRowNumber);
+        List<Integer> indexes = referenceRow.getIndexesOfValue(referenceRowValue);
+        CSVRecord record = getRow(rowNumber);
+        return record.meanValues(indexes);
     }
 
     public BigDecimal medianRow(int rowNumber){
@@ -657,14 +783,35 @@ public class CSVDataSet {
         return record.medianValues();
     }
 
+    public BigDecimal medianRowByMatching(int rowNumber, int referenceRowNumber, String referenceRowValue) {
+        CSVRecord referenceRow = getRow(referenceRowNumber);
+        List<Integer> indexes = referenceRow.getIndexesOfValue(referenceRowValue);
+        CSVRecord record = getRow(rowNumber);
+        return record.medianValues(indexes);
+    }
+
     public BigDecimal varianceRow(int rowNumber){
         CSVRecord record = getRow(rowNumber);
         return record.varianceValues();
     }
 
+    public BigDecimal varianceRowByMatching(int rowNumber, int referenceRowNumber, String referenceRowValue) {
+        CSVRecord referenceRow = getRow(referenceRowNumber);
+        List<Integer> indexes = referenceRow.getIndexesOfValue(referenceRowValue);
+        CSVRecord record = getRow(rowNumber);
+        return record.varianceValues(indexes);
+    }
+
     public BigDecimal stdDevRow(int rowNumber){
         CSVRecord record = getRow(rowNumber);
         return record.stdDevValues();
+    }
+
+    public BigDecimal stdDevRowByMatching(int rowNumber, int referenceRowNumber, String referenceRowValue) {
+        CSVRecord referenceRow = getRow(referenceRowNumber);
+        List<Integer> indexes = referenceRow.getIndexesOfValue(referenceRowValue);
+        CSVRecord record = getRow(rowNumber);
+        return record.stdDevValues(indexes);
     }
 
     /**
@@ -833,5 +980,6 @@ public class CSVDataSet {
         }
 
     }
+
 
 }

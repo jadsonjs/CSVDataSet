@@ -43,7 +43,6 @@ import java.util.List;
 class CSVRecord {
 
 
-
     public enum CSVRecordType{ ROW, COLUMN }
 
     /**
@@ -97,6 +96,22 @@ class CSVRecord {
         return total;
     }
 
+    /*
+     * Sum column values just for specific positions
+     */
+    public BigDecimal sumValues(List<Integer> indexes) {
+
+        validatedValues();
+
+        BigDecimal total = BigDecimal.ZERO;
+
+        for(int count = 0; count < indexes.size() ; count++){
+            total = total.add(convertToBD(values.get( indexes.get(count) )));
+        }
+        return total;
+    }
+
+
     /**
      * Calculate the average of values of specific record
      *
@@ -108,6 +123,19 @@ class CSVRecord {
 
         BigDecimal sum = sumValues();
         return sum.divide(new BigDecimal( values.size() ), 5, RoundingMode.HALF_UP );
+    }
+
+    /**
+     * mean just fof specific values
+     * @param indexes
+     * @return
+     */
+    public BigDecimal meanValues(List<Integer> indexes) {
+
+        validatedValues();
+
+        BigDecimal sum = sumValues(indexes);
+        return sum.divide(new BigDecimal( indexes.size() ), 5, RoundingMode.HALF_UP );
     }
 
     /**
@@ -140,6 +168,36 @@ class CSVRecord {
         return median;
     }
 
+    /**
+     * Median just for specific values
+     * @param indexes
+     * @return
+     */
+    public BigDecimal medianValues(List<Integer> indexes) {
+
+        validatedValues();
+
+        List<BigDecimal> tempList = new LinkedList<BigDecimal>();
+
+        for(int count = 0; count < indexes.size() ; count++){
+            tempList.add(convertToBD(values.get( indexes.get(count) )));
+        }
+
+        Collections.sort(tempList);
+
+        BigDecimal median = BigDecimal.ZERO;
+        // if old, it the the average of the 2 in the middle
+        if (tempList.size() % 2 == 0)
+            median = ( ( tempList.get(tempList.size()/2) )
+                    .add(   tempList.get(tempList.size()/2-1)  )
+            ).divide(new BigDecimal(2), 5, RoundingMode.HALF_UP);
+        else {
+            // If even, it is the middle element
+            median = tempList.get(tempList.size() / 2);
+        }
+
+        return median;
+    }
 
     /**
      * Calculate the variance of specific record
@@ -164,6 +222,31 @@ class CSVRecord {
         return variance;
     }
 
+    /*
+     * Variance just for specific values
+     */
+    public BigDecimal varianceValues(List<Integer> indexes) {
+
+        validatedValues();
+
+        BigDecimal variance = BigDecimal.ZERO;
+
+        BigDecimal mean = meanValues(indexes);
+
+        //  (  SUM (X - MEAN) ^ 2 ) / N-1
+        for(int count = 0; count < indexes.size() ; count++){
+            BigDecimal sub = convertToBD(  values.get( indexes.get(count) )).subtract(mean);
+            variance = variance.add( sub.pow(2) );
+        }
+
+        variance = variance.divide( new BigDecimal( indexes.size()), 5, RoundingMode.HALF_UP );
+
+        return variance;
+    }
+
+
+
+
 
     /**
      * Calculate the Standard Deviation of values of specific record
@@ -175,6 +258,21 @@ class CSVRecord {
         validatedValues();
 
         BigDecimal variance = varianceValues();
+
+        return variance.sqrt(new MathContext(5));
+    }
+
+
+    /**
+     * standard deviation just for specific values
+     * @param indexes
+     * @return
+     */
+    public BigDecimal stdDevValues(List<Integer> indexes) {
+
+        validatedValues();
+
+        BigDecimal variance = varianceValues(indexes);
 
         return variance.sqrt(new MathContext(5));
     }
@@ -212,6 +310,7 @@ class CSVRecord {
 
         return normalizedValues;
     }
+
 
 
     /**
@@ -282,6 +381,24 @@ class CSVRecord {
 
     public List<String> getValues() {
         return values;
+    }
+
+    /**
+     * Return the indexes of record that contains a specific reference value.
+     * @param referenceValue
+     * @return
+     */
+    public List<Integer> getIndexesOfValue(String referenceValue) {
+        List<Integer> indexes = new ArrayList<>();
+        int index = 0;
+        for (String value : values){
+            if(value.equals(referenceValue)){
+                indexes.add(index);
+            }
+            index++;
+        }
+
+        return indexes;
     }
 
 

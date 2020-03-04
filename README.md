@@ -3,7 +3,7 @@ CSVDataSet is a library to manipulate a DataSet stored in CSV files for Java lan
 
 #### Version: 
 
-1.0
+1.2
 
 #### Authors:
 
@@ -340,6 +340,22 @@ dataSet.removeRow(0);
 BigDecimal sum = dataSet.sumColumn("Column2.5") )
 
 dataSet.storeData();
+
+```
+
+
+```
+# we can sum/mean/median/stdDev the values of column "Column3" just where "Column5" value == true
+
+CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+
+dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4", "Column5"}) );
+dataSet.addRow(  Arrays.asList(new String[]{"1", "2", "3", "4", "true"})   );
+dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "7", "8", "false"})    );
+dataSet.addRow(  Arrays.asList(new String[]{"9", "10", "11", "12", "true"}) );
+
+//  sumCol == 14
+BigDecimal sumCol = dataSet.sumColumnByMatching("Column3", "Column5", "true");
 
 ```
 

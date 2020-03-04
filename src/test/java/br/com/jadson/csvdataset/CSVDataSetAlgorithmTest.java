@@ -26,7 +26,6 @@
  */
 package br.com.jadson.csvdataset;
 
-import br.com.jadson.csvdataset.CSVDataSet;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -61,6 +60,31 @@ public class CSVDataSetAlgorithmTest {
 
         Assertions.assertTrue( new BigDecimal("42").compareTo(sumRow) == 0 );
         Assertions.assertTrue (new BigDecimal("24").compareTo(sumCol) == 0 );
+    }
+
+
+    /**
+     * Test sum a row or a column by specific column value
+     */
+    @Test
+    void rowAndColumnSumAlgorithmByColumnValueTest() throws IOException {
+
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+
+        dataSet.clearData();
+        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4", "Column5"}) );
+        dataSet.addRow(  Arrays.asList(new String[]{"1", "2", "3", "4", "true"})   );
+        dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "7", "8", "false"})    );
+        dataSet.addRow(  Arrays.asList(new String[]{"9", "10", "11", "12", "true"}) );
+
+        // sum the values of column position 3 just where column5 == true
+        BigDecimal sumCol = dataSet.sumColumnByMatching(3, "Column5", "true");
+
+        // sum the values of column "Column3" just where "Column5" value == true
+        BigDecimal sumCol2 = dataSet.sumColumnByMatching("Column3", "Column5", "true");
+
+        Assertions.assertTrue (new BigDecimal("16").compareTo(sumCol) == 0 );
+        Assertions.assertTrue (new BigDecimal("14").compareTo(sumCol2) == 0 );
     }
 
 
@@ -107,6 +131,24 @@ public class CSVDataSetAlgorithmTest {
     }
 
 
+    @Test
+    void columnMeanAlgorithmByColumnValueTest() throws IOException {
+
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+
+        dataSet.clearData();
+        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4", "Column5"}) );
+        dataSet.addRow(  Arrays.asList(new String[]{"1", "2", "3", "4", "true"})   );
+        dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "7", "8", "false"})    );
+        dataSet.addRow(  Arrays.asList(new String[]{"9", "10", "11", "12", "true"}) );
+        dataSet.addRow(  Arrays.asList(new String[]{"1", "1", "1", "1", "true"}) );
+
+        BigDecimal meanCol = dataSet.meanColumnByMatching("Column4", "Column5", "true");
+
+        Assertions.assertTrue (new BigDecimal("5.66667").compareTo(meanCol) == 0 );
+    }
+
+
     /**
      * Test median a row or a column
      */
@@ -127,6 +169,24 @@ public class CSVDataSetAlgorithmTest {
 
         Assertions.assertTrue( new BigDecimal("10.5").compareTo(medianRow) == 0 );
         Assertions.assertTrue (new BigDecimal("8").compareTo(medianCol) == 0 );
+    }
+
+
+    @Test
+    void columnMedianAlgorithmByColumnValueTest() throws IOException {
+
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+
+        dataSet.clearData();
+        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4", "Column5"}) );
+        dataSet.addRow(  Arrays.asList(new String[]{"1", "2", "3", "4", "true"})   );
+        dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "7", "8", "false"})    );
+        dataSet.addRow(  Arrays.asList(new String[]{"9", "10", "11", "12", "true"}) );
+        dataSet.addRow(  Arrays.asList(new String[]{"1", "1", "1", "1", "true"}) );
+
+        BigDecimal meanCol = dataSet.medianColumnByMatching("Column4", "Column5", "true");
+
+        Assertions.assertTrue (new BigDecimal("4").compareTo(meanCol) == 0 );
     }
 
 
@@ -174,6 +234,71 @@ public class CSVDataSetAlgorithmTest {
         Assertions.assertTrue( new BigDecimal("3.9378").compareTo(stdDevRow) == 0 );
     }
 
+
+    @Test
+    void rowMeanAlgorithmRowValuesTest() throws IOException {
+
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+
+        dataSet.clearData();
+        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4", "Column5", "Column6", "Column7", "Column8", "Column9", "Column10" }) );
+        dataSet.addRow(  Arrays.asList(new String[]{"4", "100", "9", "11", "12", "17", "5", "8", "12", "14"})   );
+        dataSet.addRow(  Arrays.asList(new String[]{"5", "100", "6", "7", "8", "5", "6", "7", "8", "1"})    );
+        dataSet.addRow(  Arrays.asList(new String[]{"5", "100", "6", "7", "8", "5", "6", "7", "8", "1"}) );
+        dataSet.addRow(  Arrays.asList(new String[]{"YES", "NO", "YES", "YES", "YES", "YES", "YES", "YES", "YES", "YES"}) );
+
+        BigDecimal meanRow = dataSet.meanRowByMatching(0, 3, "YES");
+
+        Assertions.assertTrue( new BigDecimal("10.22222").compareTo(meanRow) == 0 );
+    }
+
+
+    @Test
+    void rowStandardDeviationAlgorithmRowValuesTest() throws IOException {
+
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+
+        dataSet.clearData();
+        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4", "Column5", "Column6", "Column7", "Column8", "Column9", "Column10" }) );
+        dataSet.addRow(  Arrays.asList(new String[]{"4", "100", "9", "11", "12", "17", "5", "8", "12", "14"})   );
+        dataSet.addRow(  Arrays.asList(new String[]{"5", "100", "6", "7", "8", "5", "6", "7", "8", "1"})    );
+        dataSet.addRow(  Arrays.asList(new String[]{"5", "100", "6", "7", "8", "5", "6", "7", "8", "1"}) );
+        dataSet.addRow(  Arrays.asList(new String[]{"YES", "NO", "YES", "YES", "YES", "YES", "YES", "YES", "YES", "YES"}) );
+
+
+        BigDecimal stdDevRow = dataSet.stdDevRowByMatching(0, 3, "YES");
+
+        Assertions.assertTrue( new BigDecimal("3.9378").compareTo(stdDevRow) == 0 );
+    }
+
+
+
+    @Test
+    void columnStandardDeviationAlgorithmColumnValuesTest() throws IOException {
+
+
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+
+        dataSet.clearData();
+        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4" }) );
+        dataSet.addRow(  Arrays.asList(new String[]{"4", "9", "4", "YES"})   );
+        dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "200", "NO"}) );
+        dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "9", "YES"})    );
+        dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "11", "YES"}) );
+        dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "12", "YES"}) );
+        dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "17", "YES"}) );
+        dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "100", "NO"}) );
+        dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "5", "YES"}) );
+        dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "8", "YES"}) );
+        dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "12", "YES"}) );
+        dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "14", "YES"}) );
+        dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "1", "NO"}) );
+
+
+        BigDecimal stdDevRow = dataSet.stdDevColumnByMatching("Column3", "Column4", "YES" );
+
+        Assertions.assertTrue( new BigDecimal("3.9378").compareTo(stdDevRow) == 0 );
+    }
 
     /**
      * Test row normalization
