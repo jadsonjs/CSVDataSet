@@ -138,15 +138,24 @@ public class CSVDataSet {
 
                 while ((line = br.readLine()) != null) {
 
-                    // each position in a line of CSV file
-                    String[] rowValues = line.split(separator);
+                    // https://stackoverflow.com/questions/18893390/splitting-on-comma-outside-quotes
+                    // that is followed by an even number of double quotes. In other words, it splits on comma outside the double quotes.
+                    // This will work provided you have balanced quotes in your string.
+                    String[] rowValues = line.split(separator+"(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
 
                     if(firstLine){
                         setHeaders(Arrays.asList(rowValues));
                         firstLine = false;
                         continue;
                     }else{
-                        addRow( Arrays.asList(rowValues) );
+                        List<String> row = new ArrayList<>();
+                        for (String value : rowValues){
+                            if(value.startsWith("\"") && value.endsWith("\"")) {
+                                value = value.substring(1, value.length()-1);
+                            }
+                            row.add(value);
+                        }
+                        addRow( row );
                     }
 
                 }
@@ -177,9 +186,17 @@ public class CSVDataSet {
             csvWriter.append(String.join(separator, header.getValues()));
             csvWriter.append("\n");
 
-            // store data
+            // store data to a CSV file.
+            // if some data has contains separator character, skip this put the value between double quotes "12,00"
             for(CSVRecord record : rows ){
-                csvWriter.append(String.join(separator, record.getValues()));
+                int size = record.getValues().size();
+                for (int i = 0 ; i < record.getValues().size() ; i++ ){
+                    String value = record.getValues().get(i);
+                    if(value.contains(separator))
+                        csvWriter.append( "\""+value+"\""+  ( i < size-1 ? separator : "" ) );
+                    else
+                        csvWriter.append( value+( i < size-1 ? separator : "" ) );
+                }
                 csvWriter.append("\n");
             }
 
@@ -559,6 +576,16 @@ public class CSVDataSet {
     //////////////////////////  operation over column  //////////////////////////////////////
 
 
+    public BigDecimal countColumnValues(int columnNumber, String matchingValue){
+        CSVRecord record = getColumn(columnNumber);
+        return record.countValues(matchingValue);
+    }
+
+    public BigDecimal countColumnValues(String columnLabel, String matchingValue) {
+        CSVRecord record = getColumnByHeaderLabel(columnLabel);
+        return record.countValues(matchingValue);
+    }
+
     public BigDecimal sumColumn(int columnNumber){
         CSVRecord record = getColumn(columnNumber);
         return record.sumValues();
@@ -766,8 +793,17 @@ public class CSVDataSet {
 
 
 
+
+
+
+
     ////////////////////////////// operation over rows ////////////////////////////////////
 
+
+    public BigDecimal countRowValues(int rowNumber, String matchingValue){
+        CSVRecord record = getRow(rowNumber);
+        return record.countValues(matchingValue);
+    }
 
     public BigDecimal sumRow(int rowNumber){
         CSVRecord record = getRow(rowNumber);
@@ -1003,6 +1039,5 @@ public class CSVDataSet {
         }
 
     }
-
 
 }

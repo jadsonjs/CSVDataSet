@@ -85,6 +85,21 @@ class CSVRecord {
         this.values.add(position, value);
     }
 
+    /**
+     * Count value of a row or column that match to the referenceValue
+     * @param matchingValue
+     * @return
+     */
+    public BigDecimal countValues(String matchingValue) {
+        validatedValues();
+        int total = 0;
+        for(String value : values){
+            if(value.equals(matchingValue))
+                total++;
+        }
+        return new BigDecimal(total);
+    }
+
     public BigDecimal sumValues() {
 
         validatedValues();

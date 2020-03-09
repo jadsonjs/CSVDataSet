@@ -382,4 +382,36 @@ public class CSVDataSetOperationTest {
 
     }
 
+
+    /**
+     * test CSV files that have comma character inside quotes
+     */
+    @Test
+    void splittingOnCommaOutSideQuotesTest() throws IOException {
+
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+
+        dataSet.clearData();
+        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4"}) );
+        dataSet.addRow(  Arrays.asList(new String[]{"1", "2,300", "3", "4"})   );
+        dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "7", "8,00"})    );
+        dataSet.addRow(  Arrays.asList(new String[]{"9", "10", "11", "12"}) );
+
+        dataSet.storeData();
+
+        dataSet.print();
+
+        dataSet.clearData();
+        dataSet.loadData();
+
+        dataSet.print();
+
+        Assertions.assertEquals( 3, dataSet.getRowCount() );
+        Assertions.assertEquals( 4, dataSet.getColumnsCount() );
+        Assertions.assertEquals( 4, dataSet.getRowValues(0).size() );
+        Assertions.assertEquals( 3, dataSet.getColumnValues(3).size() );
+
+        dataSet.deleteFile();
+    }
+
 }

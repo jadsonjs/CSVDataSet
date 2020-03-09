@@ -109,6 +109,33 @@ public class CSVDataSetAlgorithmTest {
 
 
     /**
+     * Count a number of values for a column by column label
+     * @throws IOException
+     */
+    @Test
+    void countAlgorithmTest() throws IOException {
+
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+
+        dataSet.clearData();
+        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4"}) );
+        dataSet.addRow(  Arrays.asList(new String[]{"1", "2", "3", "4"})   );
+        dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "7", "8"})    );
+        dataSet.addRow(  Arrays.asList(new String[]{"9", "10", "11", "8"}) );
+
+        BigDecimal countRow = dataSet.countRowValues(1, "8");
+
+        BigDecimal countCol1 = dataSet.countColumnValues(3, "8");
+        BigDecimal countCol2 = dataSet.countColumnValues("Column4", "8");
+
+        Assertions.assertTrue (new BigDecimal("1").compareTo(countRow) == 0 );
+
+        Assertions.assertTrue (new BigDecimal("2").compareTo(countCol1) == 0 );
+        Assertions.assertTrue (new BigDecimal("2").compareTo(countCol2) == 0 );
+    }
+
+
+    /**
      * Test mean a row or a column
      */
     @Test

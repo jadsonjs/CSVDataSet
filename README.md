@@ -1,9 +1,10 @@
 # CSVDataSet
 CSVDataSet is a library to manipulate a DataSet stored in CSV files for Java language. 
 
-#### Version: 
+#### Versions: 
 
-1.3
+1.3 - Replace Column and Row operation
+1.4 - Skip quotes and count values algorithm.
 
 #### Authors:
 
