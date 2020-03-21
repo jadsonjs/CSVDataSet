@@ -1,10 +1,12 @@
 # CSVDataSet
+
 CSVDataSet is a library to manipulate a DataSet stored in CSV files for Java language. 
 
 #### Versions: 
 
-1.3 - Replace Column and Row operation
-1.4 - Skip quotes and count values algorithm.
+ - 1.3 - Replace Column and Row operation
+ - 1.4 - Skip quotes and count values algorithm.
+ - 2.0 - Refactoring of the library, adding rows labels
 
 #### Authors:
 
@@ -13,6 +15,8 @@ CSVDataSet is a library to manipulate a DataSet stored in CSV files for Java lan
     
 ### Dependencies
     
+    Java 11
+    Gradle 5.2.1
     Junit 5.6.0
     
 ### How do I get set up?
@@ -30,16 +34,41 @@ CSVDataSet is a library to manipulate a DataSet stored in CSV files for Java lan
 
 ### How to use
 
+You can build your dataset from rows or columns.  We can have the first column as column headers and the first row as rows headers in the dataset.
+
+Headers are labels that are not process when you calculate some algorithm over the dataset.
+
+
 ```
 # You can create a CSV  by row and save to file
-# In this case, you need to set the Headers before add row
 
 CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
 
-dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4"}) );
-dataSet.addRow(  Arrays.asList(new String[]{"1", "2", "3", "4"})   );
-dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "7", "8"})    );
-dataSet.addRow(  Arrays.asList(new String[]{"9", "10", "11", "12"}) );
+dataSet.addRow(  Arrays.asList( new String[]{ " ",  "Column0", "Column1", "Column2", "Column3"})    );
+dataSet.addRow(  Arrays.asList( new String[]  {"Row0",   "1",       "2",       "3",        "4"} )   );
+dataSet.addRow(  Arrays.asList( new String[]  {"Row1",   "5",       "6",       "7",        "8"} )   );
+dataSet.addRow(  Arrays.asList( new String[]  {"Row2",   "9",       "10",     "11",       "12"} )   );
+
+dataSet.storeData();
+
+#this code you save a temp.csv file in current directory with the content:
+#  "", Column1,Column2,Column3,Column4
+#  Row0,1,2,3,4                
+#  Row1,5,6,7,8
+#  Row2,9,10,11,12
+
+```
+
+
+```
+# You can create a CSV  by row just with column headers and save to file
+
+CSVDataSet dataSet = new CSVDataSet( "temp.csv", true, false );
+
+dataSet.addRow(  Arrays.asList( new String[]{ "Column0", "Column1", "Column2", "Column3"})    );
+dataSet.addRow(  Arrays.asList( new String[]  { "1",       "2",       "3",        "4"} )   );
+dataSet.addRow(  Arrays.asList( new String[]  { "5",       "6",       "7",        "8"} )   );
+dataSet.addRow(  Arrays.asList( new String[]  { "9",       "10",     "11",       "12"} )   );
 
 dataSet.storeData();
 
@@ -51,21 +80,38 @@ dataSet.storeData();
 
 ```
 
+
 ```
-# You can create a CSV by column and save to file
-# In this case, the header of column is passed to the addColumn method.
+# You can create a CSV  by row just with rows headers and save to file
 
-CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+CSVDataSet dataSet = new CSVDataSet( "temp.csv", false, true );
 
-dataSet.addColumn(  Arrays.asList(new String[]{"1", "5", "9"})   , "Column1"  );
-dataSet.addColumn(  Arrays.asList(new String[]{"2", "6", "10"})  , "Column2"  );
-dataSet.addColumn(  Arrays.asList(new String[]{"3", "7", "11"})  , "Column3"  );
-dataSet.addColumn(  Arrays.asList(new String[]{"4", "8", "12"})  , "Column4"  );
+dataSet.addRow(  Arrays.asList( new String[]  {"Row0",   "1",       "2",       "3",        "4"} )   );
+dataSet.addRow(  Arrays.asList( new String[]  {"Row1",   "5",       "6",       "7",        "8"} )   );
+dataSet.addRow(  Arrays.asList( new String[]  {"Row2",   "9",       "10",     "11",       "12"} )   );
 
 dataSet.storeData();
 
-#this code you save a temp.csv file in current directory with the content (same content of previous example):
-#  Column1,Column2,Column3,Column4
+#this code you save a temp.csv file in current directory with the content:
+#  Row0,1,2,3,4                
+#  Row1,5,6,7,8
+#  Row2,9,10,11,12
+
+```
+
+
+```
+# You can create a CSV  by row without headers and save to file
+
+CSVDataSet dataSet = new CSVDataSet( "temp.csv", false, false );
+
+dataSet.addRow(  Arrays.asList( new String[]  {"1",       "2",       "3",        "4"} )   );
+dataSet.addRow(  Arrays.asList( new String[]  {"5",       "6",       "7",        "8"} )   );
+dataSet.addRow(  Arrays.asList( new String[]  {"9",       "10",     "11",       "12"} )   );
+
+dataSet.storeData();
+
+#this code you save a temp.csv file in current directory with the content:
 #  1,2,3,4                
 #  5,6,7,8
 #  9,10,11,12
@@ -74,26 +120,34 @@ dataSet.storeData();
 
 
 ```
-# You can remove specific columns and rows
+# You can also create a CSV  by columns. It is a way a little confused to visualize, but generated the same result
 
-CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+ CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
 
-dataSet.addColumn(  Arrays.asList(new String[]{"1", "5", "9"})   , "Column1"  );
-dataSet.addColumn(  Arrays.asList(new String[]{"2", "6", "10"})  , "Column2"  );
-dataSet.addColumn(  Arrays.asList(new String[]{"3", "7", "11"})  , "Column3"  );
-dataSet.addColumn(  Arrays.asList(new String[]{"4", "8", "12"})  , "Column4"  );
+dataSet.addColumn(  Arrays.asList(new String[]{ " ", "Row0", "Row1", "Row2", "Row3"}));
+dataSet.addColumn(  Arrays.asList(new String[]{ "Column0", "1", "2", "3", "4"})      );
+dataSet.addColumn(  Arrays.asList(new String[]{ "Column1", "5", "6", "7", "8"})      );
+dataSet.addColumn(  Arrays.asList(new String[]{ "Column2", "9", "10", "11", "12"})   );
+ 
+dataSet.storeData();
 
-dataSet.removeColumn(1);
-dataSet.removeRow(0);
+#this code you save a temp.csv file in current directory with the content:
+#  "", Column1,Column2,Column3,Column4
+#  Row0,1,2,3,4                
+#  Row1,5,6,7,8
+#  Row2,9,10,11,12
 
 ```
 
 
+
 ```
-# Load CSV from file
+# You can load data form a CSV File
 
 CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+
 dataSet.loadData();
+
 ```
 
 ```
@@ -103,8 +157,52 @@ CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
 dataSet.deleteFile();
 ```
 
+
+
 ```
-# Load CSV from file and calculating the sum of a column position 0 of CSV file
+# After create a dataset, you can access columns and rows by label or positions
+
+CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+
+dataSet.addRow(  Arrays.asList( new String[]{ " ",  "Column0", "Column1", "Column2", "Column3"})    );
+dataSet.addRow(  Arrays.asList( new String[]  {"Row0",   "1",       "2",       "3",        "4"} )   );
+dataSet.addRow(  Arrays.asList( new String[]  {"Row1",   "5",       "6",       "7",        "8"} )   );
+dataSet.addRow(  Arrays.asList( new String[]  {"Row2",   "9",       "10",     "11",       "12"} )   );
+
+
+System.out.println( dataSet.getColumnValues("Column0") )  // prints "1", "5", "9"
+System.out.println( dataSet.getRowValues("Row1") )  // prints "5", "6", "7", "8"
+
+
+System.out.println( dataSet.getColumnValues(0) )  // prints "1", "5", "9"
+System.out.println( dataSet.getRowValues(1) )  // prints "5", "6", "7", "8"
+
+
+```
+
+
+```
+# You can remove specific columns and rows
+
+CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+
+dataSet.addRow(  Arrays.asList( new String[]{ " ",  "Column0", "Column1", "Column2", "Column3"})    );
+dataSet.addRow(  Arrays.asList( new String[]  {"Row0",   "1",       "2",       "3",        "4"} )   );
+dataSet.addRow(  Arrays.asList( new String[]  {"Row1",   "5",       "6",       "7",        "8"} )   );
+dataSet.addRow(  Arrays.asList( new String[]  {"Row2",   "9",       "10",     "11",       "12"} )   );
+
+dataSet.removeColumn(1);
+dataSet.removeRow(0);
+
+```
+
+
+
+
+
+
+```
+# Load CSV from file and calculating the sum of a column position "0" of CSV file (the second column after the rows headers)
 
 CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
 dataSet.loadData();
@@ -118,30 +216,18 @@ BigDecimal sum = dataSet.sumColumn(0);
 # Create CSV  and calculating the sum of a column with label "Column1" of CSV
 
 CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
-dataSet.addColumn(  Arrays.asList(new String[]{"1", "5", "9"})   , "Column1"  );
-dataSet.addColumn(  Arrays.asList(new String[]{"2", "6", "10"})  , "Column2"  );
-dataSet.addColumn(  Arrays.asList(new String[]{"3", "7", "11"})  , "Column3"  );
-dataSet.addColumn(  Arrays.asList(new String[]{"4", "8", "12"})  , "Column4"  );
 
-BigDecimal sum = dataSet.sumColumn("Column1"); // return sum == 15
+dataSet.addRow(  Arrays.asList( new String[]{ " ",  "Column0", "Column1", "Column2", "Column3"})    );
+dataSet.addRow(  Arrays.asList( new String[]  {"Row0",   "1",       "2",       "3",        "4"} )   );
+dataSet.addRow(  Arrays.asList( new String[]  {"Row1",   "5",       "6",       "7",        "8"} )   );
+dataSet.addRow(  Arrays.asList( new String[]  {"Row2",   "9",       "10",     "11",       "12"} )   );
 
-
-```
-
+BigDecimal sum = dataSet.sumColumn("Column1"); // return sum == 18
+BigDecimal sum2 = dataSet.sumColumn(1);        // return sum == 18
 
 
 ```
-# Create CSV in memory and calculating the sum of a row 0
 
-CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
-dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4"}) );
-dataSet.addRow(  Arrays.asList(new String[]{"1", "2", "3", "4"})   );
-dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "7", "8"})    );
-dataSet.addRow(  Arrays.asList(new String[]{"9", "10", "11", "12"}) );
-
-BigDecimal sum = dataSet.sumRow(0); // return sum == 10
-
-```
 
 
 ```
@@ -152,6 +238,7 @@ dataSet.loadData();
 BigDecimal mean = dataSet.meanColumn(10);
 
 ```
+
 
 ```
 # Load CSV from file and Calculating the mean of a row position 10 of CSV file
@@ -191,6 +278,8 @@ dataSet.loadData();
 BigDecimal stdDev = dataSet.stdDevColumn(100);
 
 ```
+
+
 
 ```
 # Load CSV from file and Calculating the standard deviation of a row 100 of CSV file
@@ -238,6 +327,7 @@ dataSet.storeData();
 
 ```
 
+
 ```
 # Load CSV from file and just normalizing the  values row 1 
 # but not update the values a of CSV file
@@ -264,9 +354,11 @@ List<String> values = dataSet.getColumnValues(5);
 
 CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
 dataSet.loadData();
-List<String> values = dataSet.getColumnValues("column2");
+List<String> values = dataSet.getColumnValues("Column2");
 
 ```
+
+
 
 ```
 # Load CSV from file and Get the values of a column 5 as a list of double values
@@ -289,6 +381,7 @@ List<Integer> integerValues = dataSet.getColumnValuesAsInteger(5);
 ```
 
 
+
 ```
 # Load CSV from file and Get the values of a column 5 as a list of BigDecimal values
 
@@ -303,7 +396,7 @@ List<BigDecimal> bigDecimalValues = dataSet.getColumnValuesAsBigDecimal(5);
 ```
 # Creating a CSV in memory, Normalizing all values and after save to file.
 
-CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+CSVDataSet dataSet = new CSVDataSet( "temp.csv", true, false );
 
 dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3"}) );
 dataSet.addRow(  Arrays.asList(new String[]{ "100", "100", "100"}) );
@@ -326,7 +419,7 @@ dataSet.storeData();
 ```
 # Creating a CSV in memory, add and remove rows and columns, sum a column by label and save to file.
 
-CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+CSVDataSet dataSet = new CSVDataSet( "temp.csv", true, false  );
 dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3"}) );
 dataSet.addRow(  Arrays.asList(new String[]{"1", "2", "3"})  );
 dataSet.addRow(  Arrays.asList(new String[]{"4", "5", "6"}) );
@@ -348,7 +441,7 @@ dataSet.storeData();
 ```
 # we can sum/mean/median/stdDev the values of column "Column3" just where "Column5" value == true
 
-CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+CSVDataSet dataSet = new CSVDataSet( "temp.csv", true, false  );
 
 dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4", "Column5"}) );
 dataSet.addRow(  Arrays.asList(new String[]{"1", "2", "3", "4", "true"})   );

@@ -28,9 +28,7 @@ package br.com.jadson.csvdataset;
 
 import java.io.*;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * <p> CSVDataSet is a library to manipulate a DataSet stored in CSV files for Java language. <p/>
@@ -61,11 +59,27 @@ public class CSVDataSet {
      */
     private String fileName = "";
 
-    /** The values of first line of CSV */
-    private CSVRecord header;
+    /**
+     * Possition [0][0] when you have columnsHeader and rowsHeader
+     * usually this value does make no sense and is ignored
+     */
+    private String crossHeader = "";
 
+    /** By default the values of first line of CSV are the headers by default */
+    private CSVRecord columnsHeader;
+
+    /** By default the  values of first columns of CSV are the headers by default */
+    private CSVRecord rowsHeader;
+
+    /* If the CSV first line will be consider not a valid data, but header */
+    boolean containsColumnsHeaders = true;
+
+    /* If the CSV first column will be consider not a valid data, but header */
+    boolean containsRowsHeaders = true;
 
     /************************************************************
+     * THis is the real values, exclude headers algorithms are executed only over this data. Headers are not computed.
+     *
      * Keep rows and columns of the CSV in separated list
      *
      * This turn it slow O(N+Nˆ2) for add and remove rows or columns
@@ -112,6 +126,30 @@ public class CSVDataSet {
         this.separator = separator;
     }
 
+    /**
+     * Full constructor with the dataset does not contains headers.
+     * @param fileName
+     * @param containsColumnsHeaders
+     * @param containsRowsHeaders
+     */
+    public CSVDataSet(String fileName, boolean containsColumnsHeaders, boolean containsRowsHeaders){
+        this(fileName);
+        this.containsColumnsHeaders = containsColumnsHeaders;
+        this.containsRowsHeaders = containsRowsHeaders;
+    }
+
+    /**
+     * Full constructor with the dataset does not contains headers.
+     * @param fileName
+     * @param separator
+     * @param containsColumnsHeaders
+     * @param containsRowsHeaders
+     */
+    public CSVDataSet(String fileName, String separator, boolean containsColumnsHeaders, boolean containsRowsHeaders){
+        this(fileName, separator);
+        this.containsColumnsHeaders = containsColumnsHeaders;
+        this.containsRowsHeaders = containsRowsHeaders;
+    }
 
 
 
@@ -135,6 +173,7 @@ public class CSVDataSet {
 
                 boolean firstLine = true;
 
+                List<String> rowsHeaders = new ArrayList<>();
 
                 while ((line = br.readLine()) != null) {
 
@@ -143,22 +182,61 @@ public class CSVDataSet {
                     // This will work provided you have balanced quotes in your string.
                     String[] rowValues = line.split(separator+"(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
 
-                    if(firstLine){
-                        setHeaders(Arrays.asList(rowValues));
+                    if(firstLine && containsColumnsHeaders){ // fist line is column header
+
+                        List<String> columnsHeaders = new ArrayList<>();
+                        boolean firstElementOfColumn = true;
+
+                        for (String value : rowValues) {
+
+                            if (value.startsWith("\"") && value.endsWith("\"")) {
+                                value = value.substring(1, value.length() - 1);
+                            }
+
+                            if(firstElementOfColumn && containsRowsHeaders ) {
+                                firstElementOfColumn = false;
+                                crossHeader = value;
+                            }else{
+                                columnsHeaders.add(value);
+                            }
+
+                        }
+
+                        if(containsColumnsHeaders)
+                            setColumnsHeaders(columnsHeaders);
+
                         firstLine = false;
                         continue;
+
                     }else{
+
+                        firstLine = false;
+
+                        boolean firstElementOfRow = true;
+
                         List<String> row = new ArrayList<>();
                         for (String value : rowValues){
                             if(value.startsWith("\"") && value.endsWith("\"")) {
                                 value = value.substring(1, value.length()-1);
                             }
+
+                            if(firstElementOfRow && containsRowsHeaders ) {
+                                rowsHeaders.add(value);
+                                firstElementOfRow = false;
+                            }
+
                             row.add(value);
+
                         }
+
                         addRow( row );
                     }
 
                 }
+
+                if(containsRowsHeaders)
+                    setRowsHeaders(rowsHeaders);
+
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -175,29 +253,36 @@ public class CSVDataSet {
      */
     public void storeData(){
 
-        if(header == null || rows == null || columns == null)
+        if( rows == null || columns == null)
             throw new IllegalArgumentException("DataSet not initialized properly. Call addHeaders and addRow before");
 
-        if(header.getValues().size() != rows.get(0).getValues().size() )
-            throw new IllegalArgumentException("Size of header "+header.getValues().size() +" not equal to the size of columns: "+rows.get(0).getValues().size() );
 
         try( FileWriter csvWriter = new FileWriter( new File(fileName) ) ) {
 
-            csvWriter.append(String.join(separator, header.getValues()));
-            csvWriter.append("\n");
+            if(containsColumnsHeaders) {
+                // the first element is the crossHeader that is just a label and is disregarded
+                if(containsRowsHeaders)
+                    columnsHeader.getValues().add(0, crossHeader);
+
+                csvWriter.append(String.join(separator, columnsHeader.getValues()));
+                csvWriter.append("\n");
+            }
 
             // store data to a CSV file.
-            // if some data has contains separator character, skip this put the value between double quotes "12,00"
+            int rowCount = 0;
             for(CSVRecord record : rows ){
+
+                if(containsRowsHeaders)
+                    csvWriter.append( rowsHeader.getValues().get(rowCount)+separator );
+
                 int size = record.getValues().size();
                 for (int i = 0 ; i < record.getValues().size() ; i++ ){
                     String value = record.getValues().get(i);
-                    if(value.contains(separator))
-                        csvWriter.append( "\""+value+"\""+  ( i < size-1 ? separator : "" ) );
-                    else
-                        csvWriter.append( value+( i < size-1 ? separator : "" ) );
+                    writerValuereplacingSeparator(csvWriter, size, i, value);
                 }
                 csvWriter.append("\n");
+
+                rowCount++;
             }
 
 
@@ -206,6 +291,13 @@ public class CSVDataSet {
         }
     }
 
+    // if some data has contains separator character, skip this put the value between double quotes "12,00"
+    private void writerValuereplacingSeparator(FileWriter csvWriter, int size, int i, String value) throws IOException {
+        if(value.contains(separator))
+            csvWriter.append( "\""+value+"\""+  ( i < size-1 ? separator : "" ) );
+        else
+            csvWriter.append( value+( i < size-1 ? separator : "" ) );
+    }
 
 
     //////////////////////// Clear the memory data  /////////////////////////////
@@ -214,7 +306,7 @@ public class CSVDataSet {
      * Clear all CSV data
      */
     public void clearData() {
-        this.header = null;
+        this.columnsHeader = null;
         this.rows = null;
         this.columns = null;
     }
@@ -241,10 +333,13 @@ public class CSVDataSet {
      * Set CSV headers values
      * @param headers
      */
-    public void setHeaders(List<String> headers) {
-        header = new CSVRecord(CSVRecord.CSVRecordType.ROW, 0, new ArrayList<>( headers) );
+    private void setColumnsHeaders(List<String> headers) {
+        columnsHeader = new CSVRecord(CSVRecord.CSVRecordType.COLUMN, 0, new ArrayList<>( headers) );
     }
 
+    private void setRowsHeaders(List<String> headers) {
+        rowsHeader = new CSVRecord(CSVRecord.CSVRecordType.ROW, 0, new ArrayList<>( headers) );
+    }
 
     /**
      * Add a new row in the end of CSV
@@ -272,22 +367,49 @@ public class CSVDataSet {
      */
     public void addRow(List<String> rowValues) {
 
-        initializeRowAndColumns();
-
-        // in row N of CSV file I have all this values
-        rows.add( new CSVRecord(CSVRecord.CSVRecordType.ROW, rows.size(), new ArrayList<String>( rowValues) ) );
-
-        // add each value for all columns in the end
-        int columnPosition = 0;
-        for (String columnValue : rowValues) {
-            if( ! containsColumn(columnPosition) )
-                columns.add(new CSVRecord(CSVRecord.CSVRecordType.COLUMN, columnPosition));
-            columns.get(columnPosition).addValue(columnValue);
-            columnPosition++;
+        if(rowValues == null || rowValues.size() == 0 ){
+            throw new IllegalArgumentException("Row does not have values");
         }
 
-        validatedRowSize(rowValues);
+        initializeData();
 
+        boolean isFirstRow = rows.size() == 0 && ! columnsHeader.containsValues();
+
+        // element [0][0] is eliminated
+        if(isFirstRow && containsRowsHeaders && containsColumnsHeaders) {
+            crossHeader = rowValues.get(0);
+            rowValues = rowValues.subList(1, rowValues.size());
+            setColumnsHeaders(rowValues);
+            return;
+        }
+
+        List<String> rowsRealValues = new ArrayList<>();
+
+        // the fist values of rows is a row headers, the other values are the row values
+        if(containsRowsHeaders) {
+            rowsHeader.addValue(rowValues.get(0));
+            rowsRealValues = rowValues.subList(1, rowValues.size());
+        }else{
+            rowsRealValues = rowValues;
+        }
+
+        if(isFirstRow && containsColumnsHeaders){
+            setColumnsHeaders(rowValues); // all values are column heards
+        }else{
+            // all values are rows values
+            rows.add( new CSVRecord(CSVRecord.CSVRecordType.ROW, rows.size(), new ArrayList<String>( rowsRealValues) ) );
+
+            // for all columns , add a row value
+            int columnPosition = 0;
+            for (String columnValue : rowsRealValues) {
+                if( ! containsColumn(columnPosition) )
+                    columns.add(new CSVRecord(CSVRecord.CSVRecordType.COLUMN, columnPosition));
+                columns.get(columnPosition).addValue(columnValue);
+                columnPosition++;
+            }
+
+            validatedRowSize(rowsRealValues);
+        }
     }
 
 
@@ -318,26 +440,40 @@ public class CSVDataSet {
      */
     public void addRow(List<String> rowValues, int position) {
 
-        initializeRowAndColumns();
+        if(rowValues == null || rowValues.size() == 0 ){
+            throw new IllegalArgumentException("Row does not have values");
+        }
+
+        initializeData();
 
         for (int index = position; index < rows.size() ; index++){
             CSVRecord record = rows.get(index);
             record.incrementPosition();
         }
 
+        List<String> rowsRealValues = new ArrayList<>();
+
+        // the first element is the header
+        if(containsRowsHeaders){
+            rowsHeader.addValue(rowValues.get(0), position);
+            rowsRealValues = rowValues.subList(1, rowValues.size());
+        }else{
+            rowsRealValues = rowValues;
+        }
+
         // in row "position" of CSV file I have all this values
-        rows.add(position, new CSVRecord(CSVRecord.CSVRecordType.ROW, position, new ArrayList<String>( rowValues ) ) );
+        rows.add(position, new CSVRecord(CSVRecord.CSVRecordType.ROW, position, new ArrayList<String>( rowsRealValues ) ) );
 
         // add each value for all columns in the "position"
         int columnNumber = 0;
-        for (String colunmValue : rowValues) {
+        for (String colunmValue : rowsRealValues) {
             if( ! containsColumn(columnNumber) )
                 columns.add(new CSVRecord(CSVRecord.CSVRecordType.COLUMN, columnNumber));
             columns.get(columnNumber).addValue(colunmValue, position);
             columnNumber++;
         }
 
-        validatedRowSize(rowValues);
+        validatedRowSize(rowsRealValues);
 
     }
 
@@ -384,6 +520,9 @@ public class CSVDataSet {
             indexColumn++;
         }
 
+        if(containsRowsHeaders)
+            rowsHeader.getValues().remove(position);
+
     }
 
 
@@ -410,26 +549,51 @@ public class CSVDataSet {
      *
      * @param columnValues
      */
-    public void addColumn(List<String> columnValues, String headerValue) {
+    public void addColumn(List<String> columnValues) {
 
-        initializeHeader();
-        initializeRowAndColumns();
-
-        // in column N of CSV file I have all this values
-        columns.add( new CSVRecord(CSVRecord.CSVRecordType.COLUMN, columns.size(), new ArrayList<String>( columnValues) ) );
-        header.getValues().add(headerValue);
-
-        // add each value for all row in the last
-        int rowNumber = 0;
-        for (String colunmValue : columnValues) {
-            if( ! containsRow(rowNumber) )
-                rows.add(new CSVRecord(CSVRecord.CSVRecordType.ROW, rowNumber));
-            rows.get(rowNumber).addValue(colunmValue);
-            rowNumber++;
+        if(columnValues == null || columnValues.size() == 0 ){
+            throw new IllegalArgumentException("Column does not have values");
         }
 
-        validatedColumnSize(columnValues);
+        initializeData();
 
+        boolean isFirstColumn = columns.size() == 0 && ! rowsHeader.containsValues();
+
+        // element [0][0] is eliminated
+        if(isFirstColumn && containsRowsHeaders && containsColumnsHeaders) {
+            crossHeader = columnValues.get(0);
+            columnValues = columnValues.subList(1, columnValues.size());
+            setRowsHeaders(columnValues);
+            return;
+        }
+
+        List<String> columnsRealValues = new ArrayList<>();
+
+        // the fist values of column is a column headers, the other values are the row values
+        if(containsColumnsHeaders) {
+            columnsHeader.addValue(columnValues.get(0));
+            columnsRealValues = columnValues.subList(1, columnValues.size());
+        }else{
+            columnsRealValues = columnValues;
+        }
+
+        if(isFirstColumn && containsRowsHeaders){
+            setRowsHeaders(columnValues); // all values are column heards
+        }else{
+            // all values are rows values
+            columns.add( new CSVRecord(CSVRecord.CSVRecordType.COLUMN, columns.size(), new ArrayList<String>( columnsRealValues) ) );
+
+            // for all columns , add a row value
+            int rowNumber = 0;
+            for (String colunmValue : columnsRealValues) {
+                if( ! containsRow(rowNumber) )
+                    rows.add(new CSVRecord(CSVRecord.CSVRecordType.ROW, rowNumber));
+                rows.get(rowNumber).addValue(colunmValue);
+                rowNumber++;
+            }
+
+            validatedColumnSize(columnsRealValues);
+        }
     }
 
 
@@ -459,31 +623,43 @@ public class CSVDataSet {
      * @param columnValues
      * @param position
      */
-    public void addColumn(List<String> columnValues, String headerValue, int position) {
+    public void addColumn(List<String> columnValues, int position) {
 
-        initializeHeader();
-        initializeRowAndColumns();
+        if(columnValues == null || columnValues.size() == 0 ){
+            throw new IllegalArgumentException("Column does not have values");
+        }
+
+        initializeData();
 
         for (int index = position; index < columns.size() ; index++){
             CSVRecord record = columns.get(index);
             record.incrementPosition();
         }
 
-        // in column "position" of CSV file I have all this values
-        columns.add(position, new CSVRecord(CSVRecord.CSVRecordType.COLUMN, position, new ArrayList(columnValues) ) );
+        List<String> columnsRealValues = new ArrayList<>();
 
-        header.getValues().add(position, headerValue);
+        // the first element is the header
+        if(containsColumnsHeaders){
+            columnsHeader.addValue(columnValues.get(0), position);
+            columnsRealValues = columnValues.subList(1, columnValues.size());
+        }else{
+            columnsRealValues = columnValues;
+        }
+
+
+        // in column "position" of CSV file I have all this values
+        columns.add(position, new CSVRecord(CSVRecord.CSVRecordType.COLUMN, position, new ArrayList(columnsRealValues) ) );
 
         // add each value for all row in the "position"
         int rowNumber = 0;
-        for (String colunmValue : columnValues) {
+        for (String colunmValue : columnsRealValues) {
             if( ! containsRow(rowNumber) )
                 rows.add(new CSVRecord(CSVRecord.CSVRecordType.ROW, rowNumber));
             rows.get(rowNumber).addValue(colunmValue, position);
             rowNumber++;
         }
 
-        validatedColumnSize(columnValues);
+        validatedColumnSize(columnsRealValues);
 
     }
 
@@ -531,7 +707,8 @@ public class CSVDataSet {
             indexRow++;
         }
 
-        header.getValues().remove(position);
+        if(containsColumnsHeaders)
+            columnsHeader.getValues().remove(position);
     }
 
     /**
@@ -542,18 +719,33 @@ public class CSVDataSet {
         removeColumn(getColumnPositionByHeaderLabel(columnLabel));
     }
 
-
+    public List<String> getRowHeadersValues( )                { return rowsHeader.getValues();                         }
+    public List<String> getRowHeadersUniqueValues( )          { return getUniqueValues(rowsHeader.getValues() );       }
+    public List<String> getColumnHeadersValues( )             { return columnsHeader.getValues();                      }
+    public List<String> getColumnHeadersUniqueValues( )       { return getUniqueValues(columnsHeader.getValues() );    }
 
     public int getRowCount(){ return rows != null ? rows.size() : 0 ; }
     public int getColumnsCount(){ return columns != null ? columns.size() : 0 ; }
 
     public List<String> getRowValues(int rowPosition)                { return getRow(rowPosition).getValues(); }
+    public List<String> getRowUniqueValues(int rowPosition)          { return getUniqueValues(getRowValues(rowPosition)); }
+
     public List<BigDecimal> getRowValuesAsBigDecimal(int rowPosition){ return getRow(rowPosition).getValuesAsBigDecimal(); }
     public List<Double> getRowValuesAsDouble(int rowPosition)        { return getRow(rowPosition).getValuesAsDouble(); }
     public List<Integer> getRowValuesAsInteger(int rowPosition)      { return getRow(rowPosition).getValuesAsInteger(); }
     public List<Boolean> getRowValuesAsBoolean(int rowPosition)      { return getRow(rowPosition).getValuesAsBoolean(); }
 
+    public List<String> getRowValues(String rowLabel)                { return getRowByHeaderLabel(rowLabel).getValues(); }
+    public List<String> getRowUniqueValues(String rowLabel)          { return getUniqueValues( getRowValues(rowLabel)) ; }
+
+    public List<BigDecimal> getRowValuesAsBigDecimal(String rowLabel){ return getRowByHeaderLabel(rowLabel).getValuesAsBigDecimal(); }
+    public List<Double> getRowValuesAsDouble(String rowLabel)        { return getRowByHeaderLabel(rowLabel).getValuesAsDouble(); }
+    public List<Integer> getRowValuesAsInteger(String rowLabel)      { return getRowByHeaderLabel(rowLabel).getValuesAsInteger(); }
+    public List<Boolean> getRowValuesAsBoolean(String rowLabel)      { return getRowByHeaderLabel(rowLabel).getValuesAsBoolean(); }
+
     public List<String> getColumnValues(int columnPosition)                { return getColumn(columnPosition).getValues(); }
+    public List<String> getColumnUniqueValues(int columnPosition)         {   return getUniqueValues(getColumnValues(columnPosition)); }
+
     public List<BigDecimal> getColumnValuesAsBigDecimal(int columnPosition){ return getColumn(columnPosition).getValuesAsBigDecimal(); }
     public List<Double> getColumnValuesAsDouble(int columnPosition)        { return getColumn(columnPosition).getValuesAsDouble(); }
     public List<Integer> getColumnValuesAsInteger(int columnPosition)      { return getColumn(columnPosition).getValuesAsInteger(); }
@@ -561,10 +753,20 @@ public class CSVDataSet {
 
 
     public List<String> getColumnValues(String columnLabel)                { return getColumnByHeaderLabel(columnLabel).getValues(); }
+    public List<String> getColumnUniqueValues(String columnLabel)                { return getUniqueValues(getColumnValues(columnLabel)); }
+
     public List<BigDecimal> getColumnValuesAsBigDecimal(String columnLabel){ return getColumnByHeaderLabel(columnLabel).getValuesAsBigDecimal(); }
     public List<Double> getColumnValuesAsDouble(String columnLabel)        { return getColumnByHeaderLabel(columnLabel).getValuesAsDouble(); }
     public List<Integer> getColumnValuesAsInteger(String columnLabel)      { return getColumnByHeaderLabel(columnLabel).getValuesAsInteger(); }
     public List<Boolean> getColumnValuesAsBoolean(String columnLabel)      { return getColumnByHeaderLabel(columnLabel).getValuesAsBoolean(); }
+
+
+    private List<String> getUniqueValues( List<String> aList) {
+        Set<String> hSet = new HashSet<String>();
+        for (String x : aList)
+            hSet.add(x);
+        return  new ArrayList<>(hSet);
+    }
 
 
 
@@ -747,6 +949,8 @@ public class CSVDataSet {
         CSVRecord record = getColumn(columnPosition);
         List<String> normalizedValues = record.normalizeValues();
         if(replace) {
+            if(containsColumnsHeaders) // add header at first position
+                normalizedValues.add(0, columnsHeader.getValues().get(columnPosition));
             replaceColumn(columnPosition, normalizedValues);
         }
         return normalizedValues;
@@ -761,14 +965,10 @@ public class CSVDataSet {
      * @return
      */
     public List<String> normalizeColumn(String columnLabel, boolean replace){
-        CSVRecord record = getColumnByHeaderLabel(columnLabel);
         int columnPosition = getColumnPositionByHeaderLabel(columnLabel);
-        List<String> normalizedValues = record.normalizeValues();
-        if(replace) {
-            replaceColumn(columnPosition, normalizedValues);
-        }
-        return normalizedValues;
+        return normalizeColumn(columnPosition, replace);
     }
+
 
     /**
      * Replace a column of CSV file
@@ -776,9 +976,8 @@ public class CSVDataSet {
      * @param values
      */
     public void replaceColumn(int columnPosition, List<String> values){
-        String headerValue = header.getValues().get(columnPosition);
         removeColumn(columnPosition);
-        addColumn(values, headerValue, columnPosition);
+        addColumn(values, columnPosition);
     }
 
     /**
@@ -814,6 +1013,13 @@ public class CSVDataSet {
         CSVRecord referenceRow = getRow(referenceRowNumber);
         List<Integer> indexes = referenceRow.getIndexesOfValue(referenceRowValue);
         CSVRecord record = getRow(rowNumber);
+        return record.sumValues(indexes);
+    }
+
+    public BigDecimal sumRowByMatching(String rowLabel, String referenceRowLabel, String referenceRowValue) {
+        CSVRecord referenceColumn = getColumnByHeaderLabel(referenceRowLabel);
+        List<Integer> indexes = referenceColumn.getIndexesOfValue(referenceRowValue);
+        CSVRecord record = getColumnByHeaderLabel(rowLabel);
         return record.sumValues(indexes);
     }
 
@@ -878,9 +1084,22 @@ public class CSVDataSet {
         List<String> normalizedValues = record.normalizeValues();
 
         if(replace) {
+            if(containsRowsHeaders) // add header at first position
+                normalizedValues.add(0, rowsHeader.getValues().get(rowNumber));
             replaceRow(rowNumber, normalizedValues);
         }
         return normalizedValues;
+    }
+
+    /* Normalize the CSV row values
+     *
+     * @param rowLabel
+     * @param replace IF the old values of the column will be replaced by  normalized Values
+     * @return
+      */
+    public List<String> normalizeRow(String rowLabel, boolean replace){
+        int rowPosition = getColumnPositionByHeaderLabel(rowLabel);
+        return normalizeRow(rowPosition, replace);
     }
 
 
@@ -894,6 +1113,16 @@ public class CSVDataSet {
         addRow(values, rowNumber);
     }
 
+    /**
+     * Replace a column of CSV file
+     * @param rowLabel
+     * @param values
+     */
+    public void replaceRow(String rowLabel, List<String> values){
+        int rowPosition =  getRowPositionByHeaderLabel(rowLabel);
+        replaceRow(rowPosition, values);
+    }
+
 
     /////////////////////////////////////////////////////////////
 
@@ -902,15 +1131,21 @@ public class CSVDataSet {
      */
     public void print(){
 
-        System.out.println("Headers");
-        System.out.println(header.getValues());
+        System.out.println("Cross Header");
+        System.out.println("'"+crossHeader+"'");
 
-        System.out.println("Row");
+        System.out.println("Columns Headers");
+        System.out.println(columnsHeader.getValues());
+
+        System.out.println("Rows Headers");
+        System.out.println(rowsHeader.getValues());
+
+        System.out.println("Rows Values");
         for (CSVRecord row : rows){
             System.out.println("["+row.getType()+"]"+"("+row.getPosition()+")"+row.getValues());
         }
 
-        System.out.println("Columns");
+        System.out.println("Columns Values ");
         for (CSVRecord column : columns) {
             System.out.println("["+column.getType()+"]"+"("+column.getPosition()+")");
             for (String value : column.getValues()) {
@@ -931,7 +1166,7 @@ public class CSVDataSet {
     private CSVRecord getColumnByHeaderLabel(String columnLabel){
         int columnPosition = 0;
         boolean find = false;
-        for(String headerLabel : header.getValues()){
+        for(String headerLabel : columnsHeader.getValues()){
             if(headerLabel.equals(columnLabel)) {
                 find = true;
                 break;
@@ -943,15 +1178,42 @@ public class CSVDataSet {
         if(! find) columnPosition = -1;
 
         if(columnPosition < 0 || columnPosition >= columns.size())
-            throw new IllegalArgumentException("Column "+columnLabel+" not exits");
+            throw new IllegalArgumentException("Column \""+columnLabel+"\" does not exits");
 
         return columns.get(columnPosition);
+    }
+
+
+    /**
+     * Return the column correspondent to the header label
+     * @param rowLabel
+     * @return
+     */
+    private CSVRecord getRowByHeaderLabel(String rowLabel){
+        int rowPosition = 0;
+        boolean find = false;
+        for(String headerLabel : rowsHeader.getValues()){
+            if(headerLabel.equals(rowLabel)) {
+                find = true;
+                break;
+            }
+
+            rowPosition++;
+        }
+
+        if(! find)
+            throw new IllegalArgumentException("There is not row: "+rowLabel);
+
+        if(rowPosition < 0 || rowPosition >= rows.size())
+            throw new IllegalArgumentException("Row \""+rowLabel+"\" does not exits");
+
+        return rows.get(rowPosition);
     }
 
     private int getColumnPositionByHeaderLabel(String columnLabel) {
         int columnPosition = 0;
         boolean find = false;
-        for (String headerLabel : header.getValues()) {
+        for (String headerLabel : columnsHeader.getValues()) {
             if (headerLabel.equals(columnLabel)) {
                 find = true;
                 break;
@@ -959,20 +1221,48 @@ public class CSVDataSet {
 
             columnPosition++;
         }
-        if(! find) columnPosition = -1;
+        if(! find)
+            throw new IllegalArgumentException("There is not column: "+columnLabel);
+
         return columnPosition;
     }
 
 
+    private int getRowPositionByHeaderLabel(String rowLabel) {
+        int rowPosition = 0;
+        boolean find = false;
+        for (String headerLabel : rowsHeader.getValues()) {
+            if (headerLabel.equals(rowLabel)) {
+                find = true;
+                break;
+            }
+
+            rowPosition++;
+        }
+        if(! find)
+            throw new IllegalArgumentException("There is not row: "+rowLabel);
+
+        return rowPosition;
+    }
+
+
     private CSVRecord getColumn(int columnPosition){
+        if(isNotInitializeRowAndColumns())
+            throw new IllegalArgumentException("Data set has no data or data was not loaded ");
+
         if(columnPosition< 0 || columnPosition >= columns.size())
-            throw new IllegalArgumentException("Column Position "+columnPosition+" not exits");
+            throw new IllegalArgumentException("Column with Position \""+columnPosition+"\" does not exits");
+
         return columns.get(columnPosition);
     }
 
     private CSVRecord getRow(int rowPosition){
+        if(isNotInitializeRowAndColumns())
+            throw new IllegalArgumentException("Data set has no data or data was not loaded ");
+
         if(rowPosition< 0 || rowPosition >= rows.size())
-            throw new IllegalArgumentException("Row Position "+rowPosition+" not exits");
+            throw new IllegalArgumentException("Row with Position \""+rowPosition+"\" does not exits");
+
         return rows.get(rowPosition);
     }
 
@@ -993,49 +1283,72 @@ public class CSVDataSet {
         return false;
     }
 
-    private void initializeHeader() {
-        if(header == null)
-            setHeaders(Arrays.asList(new String[]{}) );
+    private void initializeColumnHeader() {
+        if(columnsHeader == null)
+            setColumnsHeaders(Arrays.asList(new String[]{}) );
+    }
+
+    private void initializeRowsHeader() {
+        if(rowsHeader == null)
+            setRowsHeaders(Arrays.asList(new String[]{}) );
     }
 
     private void initializeRowAndColumns() {
         if (rows == null || columns == null) {
             rows = new ArrayList<>();
             columns = new ArrayList<>();
-
         }
+    }
+
+    //initializes the list of data
+    private void initializeData() {
+        if(columnsHeader == null)
+            setColumnsHeaders(Arrays.asList(new String[]{}) );
+        if(rowsHeader == null)
+            setRowsHeaders(Arrays.asList( new String[]{}) );
+        if (rows == null || columns == null) {
+            rows = new ArrayList<>();
+            columns = new ArrayList<>();
+        }
+    }
+
+    private boolean isNotInitializeRowAndColumns() {
+        if (rows == null || columns == null) {
+            return true;
+        }
+        return false;
     }
 
     private void validatedRowSize(List<String> rowValues) {
 
-        if(header == null){
+        if(columnsHeader == null){
             throw new IllegalArgumentException("Invalid CSV file. No header found");
         }
 
         // the values need be the same size os headers values
         // header1, header2, header3
         // value1, value2, value3
-        if (rowValues.size() != header.getValues().size() ) {
-            throw new IllegalArgumentException("Invalid number of row elements. Not same size of headers elements: "  + header.getValues().size());
+        if ( containsColumnsHeaders && rowValues.size() != columnsHeader.getValues().size() ) {
+            throw new IllegalArgumentException("Invalid number of row elements: "+rowValues.size()+". Not same size of column headers elements: "  + columnsHeader.getValues().size());
         }
 
     }
 
     private void validatedColumnSize(List<String> columnValues) {
 
-        if(header == null){
-            throw new IllegalArgumentException("Invalid CSV file. No header found");
+        if(containsColumnsHeaders && columnsHeader == null){
+            throw new IllegalArgumentException("Invalid CSV file. No Column header found");
         }
 
         if(columns.size() > 1){
             // a new column needs to have the same size of first column
             if (columnValues.size() != columns.get(0).getValues().size() ) {
-                throw new IllegalArgumentException("Invalid number of columns elements. Columns should have: "  + columns.get(0).getValues().size()+" size. ");
+                throw new IllegalArgumentException("Invalid number of columns elements: "+columnValues.size()+". Columns should have: "  + columns.get(0).getValues().size()+" elements. ");
             }
         }
 
-        if(columns.size() != header.getValues().size()){
-            throw new IllegalArgumentException("Invalid number of columns elements. Columns should have same size of header labels: "  + header.getValues().size()+" size. ");
+        if(containsColumnsHeaders && columns.size() != columnsHeader.getValues().size()){
+            throw new IllegalArgumentException("Invalid number of columns elements "+columns.size()+". Columns should have same size of header labels: "  + columnsHeader.getValues().size()+" size. ");
         }
 
     }

@@ -82,6 +82,9 @@ class CSVRecord {
     public void addValue(String value, int position) {
         if(values == null)
             throw new IllegalArgumentException("CSVRecord not initialized properly. ");
+        if(this.values.size() < position)
+            throw new IllegalArgumentException("There is not "+type+" with position: "+position);
+
         this.values.add(position, value);
     }
 
@@ -398,6 +401,10 @@ class CSVRecord {
         return values;
     }
 
+    public boolean containsValues() {
+        return getValues() != null && getValues().size() > 0;
+    }
+
     /**
      * Return the indexes of record that contains a specific reference value.
      * @param referenceValue
@@ -424,6 +431,9 @@ class CSVRecord {
     public void decrementPosition() {
         this.position--;
     }
+
+
+    //////// method do convert types  ////////////
 
 
     public List<BigDecimal> getValuesAsBigDecimal() {

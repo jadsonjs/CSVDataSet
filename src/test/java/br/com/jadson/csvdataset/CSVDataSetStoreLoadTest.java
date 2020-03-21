@@ -51,51 +51,38 @@ public class CSVDataSetStoreLoadTest {
     @Test
     void storeAndLoadDataTest() throws IOException {
 
-        List<String> header = Arrays.asList( new String[]{"Column1", "Column2", "Column3", "Column4"});
-        List<String> row1 = Arrays.asList( new String[]{"1", "2", "3", "4"} );
-        List<String> row2 = Arrays.asList( new String[]{"5", "6", "7", "8"} );
-        List<String> row3 = Arrays.asList( new String[]{"9", "10", "11", "12"} );
+        List<String> header = Arrays.asList( new String[]{ "X",  "Column0", "Column1", "Column2", "Column3"});
+        List<String> row0 = Arrays.asList( new String[]  {"Row0",   "1",       "2",       "3",        "4"} );
+        List<String> row1 = Arrays.asList( new String[]  {"Row1",   "5",       "6",       "7",        "8"} );
+        List<String> row2 = Arrays.asList( new String[]  {"Row2",   "9",       "10",     "11",       "12"} );
 
-        List<String> column1 = Arrays.asList( new String[]{"1", "5", "9"} );
-        List<String> column2 = Arrays.asList( new String[]{"2", "6", "10"} );
-        List<String> column3 = Arrays.asList( new String[]{"3", "7", "11"} );
-        List<String> column4 = Arrays.asList( new String[]{"4", "8", "12"} );
 
         CSVDataSet dataSet = new CSVDataSet( "temp"+new Random().nextInt() +".csv" );;
 
-        dataSet.setHeaders(header);
+        dataSet.addRow(header);
+        dataSet.addRow(row0);
         dataSet.addRow(row1);
         dataSet.addRow(row2);
-        dataSet.addRow(row3);
+
+        dataSet.print();
+
         dataSet.storeData();
 
         dataSet.clearData();
 
         dataSet.loadData();
 
-        List<String> row1Loaded = dataSet.getRowValues(0);
-        List<String> column1Loaded = dataSet.getColumnValues(0);
+        dataSet.print();
 
-        List<String> row2Loaded = dataSet.getRowValues(1);
-        List<String> column2Loaded = dataSet.getColumnValues(1);
+        Assertions.assertTrue(Arrays.asList( new String[]  {"1", "2", "3", "4"} ).equals(dataSet.getRowValues("Row0")));
+        Assertions.assertTrue(Arrays.asList( new String[]  {"5", "6", "7", "8"} ).equals(dataSet.getRowValues("Row1")));
+        Assertions.assertTrue(Arrays.asList( new String[]  {"9", "10", "11", "12"} ).equals(dataSet.getRowValues("Row2")));
 
-        List<String> row3Loaded = dataSet.getRowValues(2);
-        List<String> column3Loaded = dataSet.getColumnValues(2);
+        Assertions.assertTrue(Arrays.asList( new String[]  {"1", "5", "9"} ).equals(dataSet.getColumnValues("Column0")) );
+        Assertions.assertTrue(Arrays.asList( new String[]  {"2", "6", "10"} ).equals(dataSet.getColumnValues("Column1")) );
+        Assertions.assertTrue(Arrays.asList( new String[]  {"3", "7", "11"} ).equals(dataSet.getColumnValues("Column2")) );
+        Assertions.assertTrue(Arrays.asList( new String[]  {"4", "8", "12"} ).equals(dataSet.getColumnValues("Column3")) );
 
-        List<String> column4Loaded = dataSet.getColumnValues(3);
-
-
-
-        Assertions.assertTrue(row1.equals(row1Loaded));
-        Assertions.assertTrue(column1.equals(column1Loaded));
-
-        Assertions.assertTrue(row2.equals(row2Loaded));
-        Assertions.assertTrue(column2.equals(column2Loaded));
-
-        Assertions.assertTrue(row3.equals(row3Loaded));
-        Assertions.assertTrue(column3.equals(column3Loaded));
-
-        Assertions.assertTrue(column4.equals(column4Loaded));
 
         dataSet.deleteFile();
 
@@ -114,14 +101,9 @@ public class CSVDataSetStoreLoadTest {
         List<String> row2 = Arrays.asList( new String[]{"5", "6", "7", "8"} );
         List<String> row3 = Arrays.asList( new String[]{"9", "10", "11", "12"} );
 
-        List<String> column1 = Arrays.asList( new String[]{"1", "5", "9"} );
-        List<String> column2 = Arrays.asList( new String[]{"2", "6", "10"} );
-        List<String> column3 = Arrays.asList( new String[]{"3", "7", "11"} );
-        List<String> column4 = Arrays.asList( new String[]{"4", "8", "12"} );
+        CSVDataSet dataSet = new CSVDataSet( "temp"+new Random().nextInt() +".csv", ";", true, false );
 
-        CSVDataSet dataSet = new CSVDataSet( "temp"+new Random().nextInt() +".csv", ";" );
-
-        dataSet.setHeaders(header);
+        dataSet.addRow(header);
         dataSet.addRow(row1);
         dataSet.addRow(row2);
         dataSet.addRow(row3);
@@ -131,29 +113,14 @@ public class CSVDataSetStoreLoadTest {
 
         dataSet.loadData();
 
-        List<String> row1Loaded = dataSet.getRowValues(0);
-        List<String> column1Loaded = dataSet.getColumnValues(0);
+        Assertions.assertTrue(Arrays.asList( new String[]  {"1", "5", "9"} ).equals(dataSet.getColumnValues("Column1")) );
+        Assertions.assertTrue(Arrays.asList( new String[]  {"2", "6", "10"} ).equals(dataSet.getColumnValues("Column2")) );
+        Assertions.assertTrue(Arrays.asList( new String[]  {"3", "7", "11"} ).equals(dataSet.getColumnValues("Column3")) );
+        Assertions.assertTrue(Arrays.asList( new String[]  {"4", "8", "12"} ).equals(dataSet.getColumnValues("Column4")) );
 
-        List<String> row2Loaded = dataSet.getRowValues(1);
-        List<String> column2Loaded = dataSet.getColumnValues(1);
-
-        List<String> row3Loaded = dataSet.getRowValues(2);
-        List<String> column3Loaded = dataSet.getColumnValues(2);
-
-        List<String> column4Loaded = dataSet.getColumnValues(3);
-
-
-
-        Assertions.assertTrue(row1.equals(row1Loaded));
-        Assertions.assertTrue(column1.equals(column1Loaded));
-
-        Assertions.assertTrue(row2.equals(row2Loaded));
-        Assertions.assertTrue(column2.equals(column2Loaded));
-
-        Assertions.assertTrue(row3.equals(row3Loaded));
-        Assertions.assertTrue(column3.equals(column3Loaded));
-
-        Assertions.assertTrue(column4.equals(column4Loaded));
+        Assertions.assertTrue(Arrays.asList( new String[]  {"1", "2", "3", "4"} ).equals(dataSet.getRowValues(0)));
+        Assertions.assertTrue(Arrays.asList( new String[]  {"5", "6", "7", "8"} ).equals(dataSet.getRowValues(1)));
+        Assertions.assertTrue(Arrays.asList( new String[]  {"9", "10", "11", "12"} ).equals(dataSet.getRowValues(2)));
 
         dataSet.deleteFile();
 
@@ -168,7 +135,7 @@ public class CSVDataSetStoreLoadTest {
         Instant start = Instant.now();
 
         String userDirectory = FileSystems.getDefault().getPath("").toAbsolutePath().toString();
-        CSVDataSet dataSet = new CSVDataSet( userDirectory+"/src/test/resources/mediumfile.csv" );;
+        CSVDataSet dataSet = new CSVDataSet( userDirectory+"/src/test/resources/mediumfile.csv", true, false );
         dataSet.loadData();
 
         System.out.println("load in: "+Duration.between(start, Instant.now()).toMillis());
@@ -189,7 +156,7 @@ public class CSVDataSetStoreLoadTest {
         Instant start = Instant.now();
 
         String userDirectory = FileSystems.getDefault().getPath("").toAbsolutePath().toString();
-        CSVDataSet dataSet = new CSVDataSet( userDirectory+"/src/test/resources/bigfile.csv" );;
+        CSVDataSet dataSet = new CSVDataSet( userDirectory+"/src/test/resources/bigfile.csv", true, false );
         dataSet.loadData();
 
         System.out.println("load in: "+Duration.between(start, Instant.now()).toMillis());
@@ -211,7 +178,7 @@ public class CSVDataSetStoreLoadTest {
         Instant start = Instant.now();
 
         String userDirectory = FileSystems.getDefault().getPath("").toAbsolutePath().toString();
-        CSVDataSet dataSet = new CSVDataSet( userDirectory+"/src/test/resources/hugefile.csv" );;
+        CSVDataSet dataSet = new CSVDataSet( userDirectory+"/src/test/resources/hugefile.csv", true, false );
         dataSet.loadData();
 
         System.out.println("load in: "+Duration.between(start, Instant.now()).toMillis());
@@ -223,5 +190,6 @@ public class CSVDataSetStoreLoadTest {
         Assertions.assertTrue(new BigDecimal(0).compareTo(dataSet.stdDevColumn(0)) == 0);
 
     }
+
 
 }

@@ -47,10 +47,10 @@ public class CSVDataSetAlgorithmTest {
     @Test
     void rowAndColumnSumAlgorithmTest() throws IOException {
 
-        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv", true, false );
 
         dataSet.clearData();
-        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4"}) );
+        dataSet.addRow( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4"}) );
         dataSet.addRow(  Arrays.asList(new String[]{"1", "2", "3", "4"})   );
         dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "7", "8"})    );
         dataSet.addRow(  Arrays.asList(new String[]{"9", "10", "11", "12"}) );
@@ -69,10 +69,10 @@ public class CSVDataSetAlgorithmTest {
     @Test
     void rowAndColumnSumAlgorithmByColumnValueTest() throws IOException {
 
-        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv", true, false );
 
         dataSet.clearData();
-        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4", "Column5"}) );
+        dataSet.addRow( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4", "Column5"}) );
         dataSet.addRow(  Arrays.asList(new String[]{"1", "2", "3", "4", "true"})   );
         dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "7", "8", "false"})    );
         dataSet.addRow(  Arrays.asList(new String[]{"9", "10", "11", "12", "true"}) );
@@ -94,10 +94,10 @@ public class CSVDataSetAlgorithmTest {
     @Test
     void columnSumAlgorithmByLabelTest() throws IOException {
 
-        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv", true, false );
 
         dataSet.clearData();
-        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4"}) );
+        dataSet.addRow( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4"}) );
         dataSet.addRow(  Arrays.asList(new String[]{"1", "2", "3", "4"})   );
         dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "7", "8"})    );
         dataSet.addRow(  Arrays.asList(new String[]{"9", "10", "11", "12"}) );
@@ -115,10 +115,10 @@ public class CSVDataSetAlgorithmTest {
     @Test
     void countAlgorithmTest() throws IOException {
 
-        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" , true, false);
 
         dataSet.clearData();
-        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4"}) );
+        dataSet.addRow( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4"}) );
         dataSet.addRow(  Arrays.asList(new String[]{"1", "2", "3", "4"})   );
         dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "7", "8"})    );
         dataSet.addRow(  Arrays.asList(new String[]{"9", "10", "11", "8"}) );
@@ -141,10 +141,10 @@ public class CSVDataSetAlgorithmTest {
     @Test
     void rowAndColumnMeanAlgorithmTest() throws IOException {
 
-        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv", true, false );
 
         dataSet.clearData();
-        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4"}) );
+        dataSet.addRow( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4"}) );
         dataSet.addRow(  Arrays.asList(new String[]{"1", "2", "3", "4"})   );
         dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "7", "8"})    );
         dataSet.addRow(  Arrays.asList(new String[]{"9", "10", "11", "12"}) );
@@ -161,10 +161,10 @@ public class CSVDataSetAlgorithmTest {
     @Test
     void columnMeanAlgorithmByColumnValueTest() throws IOException {
 
-        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" , true, false);
 
         dataSet.clearData();
-        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4", "Column5"}) );
+        dataSet.addRow( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4", "Column5"}) );
         dataSet.addRow(  Arrays.asList(new String[]{"1", "2", "3", "4", "true"})   );
         dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "7", "8", "false"})    );
         dataSet.addRow(  Arrays.asList(new String[]{"9", "10", "11", "12", "true"}) );
@@ -182,10 +182,10 @@ public class CSVDataSetAlgorithmTest {
     @Test
     void rowAndColumnMedianAlgorithmTest() throws IOException {
 
-        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv", true, false );
 
         dataSet.clearData();
-        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4"}) );
+        dataSet.addRow( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4"}) );
         dataSet.addRow(  Arrays.asList(new String[]{"1", "2", "3", "4"})   );
         dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "7", "8"})    );
         dataSet.addRow(  Arrays.asList(new String[]{"9", "10", "11", "12"}) );
@@ -202,10 +202,10 @@ public class CSVDataSetAlgorithmTest {
     @Test
     void columnMedianAlgorithmByColumnValueTest() throws IOException {
 
-        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv", true, false );
 
         dataSet.clearData();
-        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4", "Column5"}) );
+        dataSet.addRow( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4", "Column5"}) );
         dataSet.addRow(  Arrays.asList(new String[]{"1", "2", "3", "4", "true"})   );
         dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "7", "8", "false"})    );
         dataSet.addRow(  Arrays.asList(new String[]{"9", "10", "11", "12", "true"}) );
@@ -223,10 +223,10 @@ public class CSVDataSetAlgorithmTest {
     @Test
     void rowAndColumnVarianceAlgorithmTest() throws IOException {
 
-        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" , true, false);
 
         dataSet.clearData();
-        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4"}) );
+        dataSet.addRow( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4"}) );
         dataSet.addRow(  Arrays.asList(new String[]{"1", "2", "3", "4"})   );
         dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "7", "8"})    );
         dataSet.addRow(  Arrays.asList(new String[]{"9", "10", "11", "12"}) );
@@ -247,10 +247,10 @@ public class CSVDataSetAlgorithmTest {
     void rowAndColumnStandardDeviationAlgorithmTest() throws IOException {
 
 
-        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv", true, false );
 
         dataSet.clearData();
-        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4", "Column5", "Column6", "Column7", "Column8", "Column9" }) );
+        dataSet.addRow( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4", "Column5", "Column6", "Column7", "Column8", "Column9" }) );
         dataSet.addRow(  Arrays.asList(new String[]{"4", "9", "11", "12", "17", "5", "8", "12", "14"})   );
         dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "7", "8", "5", "6", "7", "8", "1"})    );
         dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "7", "8", "5", "6", "7", "8", "1"}) );
@@ -265,10 +265,10 @@ public class CSVDataSetAlgorithmTest {
     @Test
     void rowMeanAlgorithmRowValuesTest() throws IOException {
 
-        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv", true, false );
 
         dataSet.clearData();
-        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4", "Column5", "Column6", "Column7", "Column8", "Column9", "Column10" }) );
+        dataSet.addRow( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4", "Column5", "Column6", "Column7", "Column8", "Column9", "Column10" }) );
         dataSet.addRow(  Arrays.asList(new String[]{"4", "100", "9", "11", "12", "17", "5", "8", "12", "14"})   );
         dataSet.addRow(  Arrays.asList(new String[]{"5", "100", "6", "7", "8", "5", "6", "7", "8", "1"})    );
         dataSet.addRow(  Arrays.asList(new String[]{"5", "100", "6", "7", "8", "5", "6", "7", "8", "1"}) );
@@ -283,10 +283,10 @@ public class CSVDataSetAlgorithmTest {
     @Test
     void rowStandardDeviationAlgorithmRowValuesTest() throws IOException {
 
-        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv", true, false );
 
         dataSet.clearData();
-        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4", "Column5", "Column6", "Column7", "Column8", "Column9", "Column10" }) );
+        dataSet.addRow( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4", "Column5", "Column6", "Column7", "Column8", "Column9", "Column10" }) );
         dataSet.addRow(  Arrays.asList(new String[]{"4", "100", "9", "11", "12", "17", "5", "8", "12", "14"})   );
         dataSet.addRow(  Arrays.asList(new String[]{"5", "100", "6", "7", "8", "5", "6", "7", "8", "1"})    );
         dataSet.addRow(  Arrays.asList(new String[]{"5", "100", "6", "7", "8", "5", "6", "7", "8", "1"}) );
@@ -304,10 +304,10 @@ public class CSVDataSetAlgorithmTest {
     void columnStandardDeviationAlgorithmColumnValuesTest() throws IOException {
 
 
-        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" , true, false);
 
         dataSet.clearData();
-        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4" }) );
+        dataSet.addRow( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4" }) );
         dataSet.addRow(  Arrays.asList(new String[]{"4", "9", "4", "YES"})   );
         dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "200", "NO"}) );
         dataSet.addRow(  Arrays.asList(new String[]{"5", "6", "9", "YES"})    );
@@ -335,10 +335,10 @@ public class CSVDataSetAlgorithmTest {
     @Test
     void rowNormalizationAlgorithmTest() throws IOException {
 
-        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv", true, false );
 
         dataSet.clearData();
-        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4", "Column5", "Column6", "Column7"}) );
+        dataSet.addRow( Arrays.asList(new String[]{"Column1", "Column2", "Column3", "Column4", "Column5", "Column6", "Column7"}) );
         dataSet.addRow(  Arrays.asList(new String[]{"100", "50", "11", "5", "40", "140", "200"})   );
 
 
@@ -359,10 +359,10 @@ public class CSVDataSetAlgorithmTest {
     @Test
     void normalizeAllColumnAlgorithmTest() throws IOException {
 
-        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv", true, false );
 
         dataSet.clearData();
-        dataSet.setHeaders( Arrays.asList(new String[]{"Column1", "Column2", "Column3"}) );
+        dataSet.addRow( Arrays.asList(new String[]{"Column1", "Column2", "Column3"}) );
         dataSet.addRow(  Arrays.asList(new String[]{ "100", "100", "100"}) );
         dataSet.addRow(  Arrays.asList(new String[]{ "50",   "50",  "50"}) );
         dataSet.addRow(  Arrays.asList(new String[]{ "11",   "11",  "11"}) );
@@ -377,13 +377,11 @@ public class CSVDataSetAlgorithmTest {
 
         dataSet.print();
 
-        List<String> normalizedValues0 =  Arrays.asList(new String[]{"0.48718", "0.23077", "0.03077", "0.00000", "0.17949", "0.69231", "1.00000"});
-        List<String> normalizedValues1 =  Arrays.asList(new String[]{"0.48718", "0.23077", "0.03077", "0.00000", "0.17949", "0.69231", "1.00000"});
-        List<String> normalizedValues2 =  Arrays.asList(new String[]{"0.48718", "0.23077", "0.03077", "0.00000", "0.17949", "0.69231", "1.00000"});
+        List<String> normalizedValues =  Arrays.asList(new String[]{"0.48718", "0.23077", "0.03077", "0.00000", "0.17949", "0.69231", "1.00000"});
 
-        Assertions.assertTrue( normalizedValues0.equals(dataSet.getColumnValues(0)) );
-        Assertions.assertTrue( normalizedValues1.equals(dataSet.getColumnValues(1)) );
-        Assertions.assertTrue( normalizedValues2.equals(dataSet.getColumnValues(2)) );
+        Assertions.assertTrue( normalizedValues.equals(dataSet.getColumnValues(0)) );
+        Assertions.assertTrue( normalizedValues.equals(dataSet.getColumnValues(1)) );
+        Assertions.assertTrue( normalizedValues.equals(dataSet.getColumnValues(2)) );
     }
 
     /**
@@ -394,21 +392,22 @@ public class CSVDataSetAlgorithmTest {
     @Test
     void columnNormalizationAlgorithmTest() throws IOException {
 
-        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv", true, false);
 
-        dataSet.clearData();
-        dataSet.addColumn(  Arrays.asList(new String[]{"100", "50", "11", "5", "40", "140", "200"}) , "Column1"  );
+        dataSet.addColumn(  Arrays.asList(new String[]{"Column1", "100", "50", "11", "5", "40", "140", "200"}) );
 
         dataSet.print();
 
-        List<String> normalizedRowValues = dataSet.normalizeColumn(0, true);
+        List<String> normalizedColumnValues = dataSet.normalizeColumn(0, true);
 
         List<String> normalizedValues =  Arrays.asList(new String[]{"0.48718", "0.23077", "0.03077", "0.00000", "0.17949", "0.69231", "1.00000"});
 
         dataSet.print();
 
-        Assertions.assertTrue( normalizedRowValues.equals(dataSet.getColumnValues(0)) );
-        Assertions.assertTrue (normalizedRowValues.equals( normalizedValues ));
+        System.out.println("returned values: "+dataSet.getColumnValues(0));
+
+        Assertions.assertTrue( normalizedValues.equals( dataSet.getColumnValues(0)) );
+
     }
 
 
@@ -421,21 +420,18 @@ public class CSVDataSetAlgorithmTest {
     @Test
     void columnNormalizationAlgorithmByColumnValueTest() throws IOException {
 
-        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv", true, false );
 
         dataSet.clearData();
-        dataSet.addColumn(  Arrays.asList(new String[]{"100", "50", "11", "5", "40", "140", "200"}) , "Column1"  );
-
-        dataSet.print();
+        dataSet.addColumn(  Arrays.asList(new String[]{"Column1", "100", "50", "11", "5", "40", "140", "200"}) );
 
         List<String> normalizedRowValues = dataSet.normalizeColumn("Column1", true);
 
-        List<String> normalizedValues =  Arrays.asList(new String[]{"0.48718", "0.23077", "0.03077", "0.00000", "0.17949", "0.69231", "1.00000"});
-
         dataSet.print();
 
-        Assertions.assertTrue( normalizedRowValues.equals(dataSet.getColumnValues(0)) );
-        Assertions.assertTrue (normalizedRowValues.equals( normalizedValues ));
+        Assertions.assertTrue(  dataSet.getColumnValues("Column1").equals(
+            Arrays.asList(new String[]{"0.48718", "0.23077", "0.03077", "0.00000", "0.17949", "0.69231", "1.00000"})
+                ) );
     }
 
 
@@ -447,10 +443,10 @@ public class CSVDataSetAlgorithmTest {
     @Test
     void columnNormalizationWithoutReplaceAlgorithmTest() throws IOException {
 
-        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv", true, false );
 
         dataSet.clearData();
-        dataSet.addColumn(  Arrays.asList(new String[]{"100", "50", "11", "5", "40", "140", "200"}) , "Column1"  );
+        dataSet.addColumn(  Arrays.asList(new String[]{"Column1", "100", "50", "11", "5", "40", "140", "200"})  );
 
         List<String> noNormalizedValues =  Arrays.asList(new String[]{"100", "50", "11", "5", "40", "140", "200"});
         List<String> normalizedValues =  Arrays.asList(new String[]{"0.48718", "0.23077", "0.03077", "0.00000", "0.17949", "0.69231", "1.00000"});
