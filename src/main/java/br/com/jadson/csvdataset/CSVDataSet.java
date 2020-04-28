@@ -59,6 +59,8 @@ public class CSVDataSet {
      */
     private String fileName = "";
 
+    private boolean append = false;
+
     /**
      * Possition [0][0] when you have columnsHeader and rowsHeader
      * usually this value does make no sense and is ignored
@@ -115,6 +117,16 @@ public class CSVDataSet {
     }
 
     /**
+     * Default constructor with a file name
+     * @param fileName
+     */
+    public CSVDataSet(String fileName, boolean append){
+        this(fileName);
+        this.append = append;
+    }
+
+
+    /**
      * Constructor with CSV separator
      * @param fileName
      * @param separator
@@ -124,6 +136,19 @@ public class CSVDataSet {
         if(separator == null || separator.trim().isEmpty() || separator.length() != 1)
             throw new IllegalArgumentException("Separator can't be null and have to be a character.");
         this.separator = separator;
+    }
+
+    /**
+     * Constructor with CSV separator and append
+     * @param fileName
+     * @param separator
+     */
+    public CSVDataSet(String fileName, String separator, boolean append){
+        this(fileName);
+        if(separator == null || separator.trim().isEmpty() || separator.length() != 1)
+            throw new IllegalArgumentException("Separator can't be null and have to be a character.");
+        this.separator = separator;
+        this.append = append;
     }
 
     /**
@@ -141,6 +166,19 @@ public class CSVDataSet {
     /**
      * Full constructor with the dataset does not contains headers.
      * @param fileName
+     * @param containsColumnsHeaders
+     * @param containsRowsHeaders
+     */
+    public CSVDataSet(String fileName,  boolean append, boolean containsColumnsHeaders, boolean containsRowsHeaders){
+        this(fileName);
+        this.containsColumnsHeaders = containsColumnsHeaders;
+        this.containsRowsHeaders = containsRowsHeaders;
+        this.append = append;
+    }
+
+    /**
+     * Full constructor with the dataset does not contains headers.
+     * @param fileName
      * @param separator
      * @param containsColumnsHeaders
      * @param containsRowsHeaders
@@ -151,6 +189,19 @@ public class CSVDataSet {
         this.containsRowsHeaders = containsRowsHeaders;
     }
 
+
+    /**
+     * Full constructor with the dataset does not contains headers.
+     * @param fileName
+     * @param separator
+     * @param containsColumnsHeaders
+     * @param containsRowsHeaders
+     */
+    public CSVDataSet(String fileName, String separator, boolean append, boolean containsColumnsHeaders, boolean containsRowsHeaders){
+        this(fileName, separator, append);
+        this.containsColumnsHeaders = containsColumnsHeaders;
+        this.containsRowsHeaders = containsRowsHeaders;
+    }
 
 
 
@@ -257,7 +308,7 @@ public class CSVDataSet {
             throw new IllegalArgumentException("DataSet not initialized properly. Call addHeaders and addRow before");
 
 
-        try( FileWriter csvWriter = new FileWriter( new File(fileName) ) ) {
+        try( FileWriter csvWriter = new FileWriter( new File(fileName), append ) ) {
 
             if(containsColumnsHeaders) {
                 // the first element is the crossHeader that is just a label and is disregarded

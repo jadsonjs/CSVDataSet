@@ -57,7 +57,7 @@ public class CSVDataSetStoreLoadTest {
         List<String> row2 = Arrays.asList( new String[]  {"Row2",   "9",       "10",     "11",       "12"} );
 
 
-        CSVDataSet dataSet = new CSVDataSet( "temp"+new Random().nextInt() +".csv" );;
+        CSVDataSet dataSet = new CSVDataSet( "temp"+new Random().nextInt() +".csv" );
 
         dataSet.addRow(header);
         dataSet.addRow(row0);
@@ -88,6 +88,62 @@ public class CSVDataSetStoreLoadTest {
 
     }
 
+
+    /**
+     * Test store  and load from CSV
+     */
+    @Test
+    void storeAndLoadDataWithAppendTest() throws IOException {
+
+        List<String> header = Arrays.asList( new String[]{ "X",  "Column0", "Column1", "Column2", "Column3"});
+        List<String> row0 = Arrays.asList( new String[]  {"Row0",   "1",       "2",       "3",        "4"} );
+        List<String> row1 = Arrays.asList( new String[]  {"Row1",   "5",       "6",       "7",        "8"} );
+        List<String> row2 = Arrays.asList( new String[]  {"Row2",   "9",       "10",     "11",       "12"} );
+
+        String fileName = "temp"+new Random().nextInt() +".csv";
+
+        CSVDataSet dataSet = new CSVDataSet( fileName );
+
+        dataSet.addRow(header);
+        dataSet.addRow(row0);
+        dataSet.addRow(row1);
+        dataSet.addRow(row2);
+
+        dataSet.print();
+        dataSet.storeData();
+        dataSet.clearData();
+        System.out.println("----------------------------------------------");
+
+        // we can open the same file to append more data
+        // just remember the not add another column heard
+        CSVDataSet dataSet2 = new CSVDataSet( fileName, true, false, true );
+
+        dataSet2.addRow(Arrays.asList( new String[]  {"Row3",   "10",       "10",       "10",        "10"} ));
+        dataSet2.addRow(Arrays.asList( new String[]  {"Row4",   "20",       "20",       "20",        "20"} ));
+
+        dataSet2.print();
+        dataSet2.storeData();
+
+        System.out.println("----------------------------------------------");
+
+        CSVDataSet dataSet3 = new CSVDataSet( fileName );
+        dataSet3.loadData();
+
+        Assertions.assertTrue(Arrays.asList( new String[]  {"1", "2", "3", "4"} ).equals(dataSet3.getRowValues("Row0")));
+        Assertions.assertTrue(Arrays.asList( new String[]  {"5", "6", "7", "8"} ).equals(dataSet3.getRowValues("Row1")));
+        Assertions.assertTrue(Arrays.asList( new String[]  {"9", "10", "11", "12"} ).equals(dataSet3.getRowValues("Row2")));
+        Assertions.assertTrue(Arrays.asList( new String[]  {"10", "10", "10", "10"} ).equals(dataSet3.getRowValues("Row3")));
+        Assertions.assertTrue(Arrays.asList( new String[]  {"20", "20", "20", "20"} ).equals(dataSet3.getRowValues("Row4")));
+
+        Assertions.assertTrue(Arrays.asList( new String[]  {"1", "5", "9", "10", "20"} ).equals(dataSet3.getColumnValues("Column0")) );
+        Assertions.assertTrue(Arrays.asList( new String[]  {"2", "6", "10", "10", "20"} ).equals(dataSet3.getColumnValues("Column1")) );
+        Assertions.assertTrue(Arrays.asList( new String[]  {"3", "7", "11", "10", "20"} ).equals(dataSet3.getColumnValues("Column2")) );
+        Assertions.assertTrue(Arrays.asList( new String[]  {"4", "8", "12", "10", "20"} ).equals(dataSet3.getColumnValues("Column3")) );
+
+
+        dataSet3.deleteFile();
+
+    }
 
 
     /**
