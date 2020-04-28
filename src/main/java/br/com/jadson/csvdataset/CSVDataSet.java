@@ -768,6 +768,88 @@ public class CSVDataSet {
         return  new ArrayList<>(hSet);
     }
 
+    /**
+     * Return the values of a row that match with values of other row
+     *
+     * Example:
+     *    dataSet.getRowValuesByMatching(0, 3, "Q4")
+     *
+     * return all row(0) values where row(3) row has the value "Q4"
+     *
+     * @param rowNumber
+     * @param referenceRowNumber
+     * @param referenceRowValue
+     * @return
+     */
+    public List<String> getRowValuesByMatching(int rowNumber, int referenceRowNumber, String referenceRowValue) {
+        CSVRecord referenceRow = getRow(referenceRowNumber);
+        List<Integer> indexes = referenceRow.getIndexesOfValue(referenceRowValue);
+        CSVRecord record = getRow(rowNumber);
+        return record.getValues(indexes);
+    }
+
+
+    /**
+     * Return the values of a row that match with values of other row
+     *
+     * Example:
+     *    dataSet.getRowValuesByMatching("project", "Quarter", "Q4")
+     *
+     * return all row "project" values where "Quarter" row has the value "Q4"
+     *
+     * @param rowLabel
+     * @param referenceRowLabel
+     * @param referenceRowValue
+     * @return
+     */
+    public List<String> getRowValuesByMatching(String rowLabel, String referenceRowLabel, String referenceRowValue) {
+        CSVRecord referenceColumn = getRowByHeaderLabel(referenceRowLabel);
+        List<Integer> indexes = referenceColumn.getIndexesOfValue(referenceRowValue);
+        CSVRecord record = getRowByHeaderLabel(rowLabel);
+        return record.getValues(indexes);
+    }
+
+
+    /**
+     * Return the values of a column that match with values of other column
+     *
+     * Example:
+     *    dataSet.getColumnValuesByMatching(0, 3, "Q4")
+     *
+     * return all column(0) values where column(0) column has the value "Q4"
+     *
+     * @param columnNumber
+     * @param referenceColumnNumber
+     * @param referenceColumnValue
+     * @return
+     */
+    public List<String> getColumnValuesByMatching(int columnNumber, int referenceColumnNumber, String referenceColumnValue) {
+        CSVRecord referenceColumn = getColumn(referenceColumnNumber);
+        List<Integer> indexes = referenceColumn.getIndexesOfValue(referenceColumnValue);
+        CSVRecord record = getColumn(columnNumber);
+        return record.getValues(indexes);
+    }
+
+    /**
+     * Return the values of a column that match with values of other column
+     *
+     * Example:
+     *    dataSet.getColumnValuesByMatching("project", "Quarter", "Q4")
+     *
+     * return all "project" column values where "Quarter" column has the value "Q4"
+     *
+     * @param columnLabel
+     * @param referenceColumnLabel
+     * @param referenceColumnValue
+     * @return
+     */
+    public List<String> getColumnValuesByMatching(String columnLabel, String referenceColumnLabel, String referenceColumnValue) {
+        CSVRecord referenceColumn = getColumnByHeaderLabel(referenceColumnLabel);
+        List<Integer> indexes = referenceColumn.getIndexesOfValue(referenceColumnValue);
+        CSVRecord record = getColumnByHeaderLabel(columnLabel);
+        return record.getValues(indexes);
+    }
+
 
 
     ////////////////////   Algorithm over numeric data   ///////////////////////
@@ -1017,9 +1099,9 @@ public class CSVDataSet {
     }
 
     public BigDecimal sumRowByMatching(String rowLabel, String referenceRowLabel, String referenceRowValue) {
-        CSVRecord referenceColumn = getColumnByHeaderLabel(referenceRowLabel);
-        List<Integer> indexes = referenceColumn.getIndexesOfValue(referenceRowValue);
-        CSVRecord record = getColumnByHeaderLabel(rowLabel);
+        CSVRecord referenceRow = getRowByHeaderLabel(referenceRowLabel);
+        List<Integer> indexes = referenceRow.getIndexesOfValue(referenceRowValue);
+        CSVRecord record = getRowByHeaderLabel(rowLabel);
         return record.sumValues(indexes);
     }
 

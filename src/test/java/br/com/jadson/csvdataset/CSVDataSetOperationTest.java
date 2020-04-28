@@ -820,4 +820,72 @@ public class CSVDataSetOperationTest {
 
     }
 
+
+
+
+
+    /**
+     * Test a data matching recovery by column
+     */
+    @Test
+    void matchingColumnValuesTest() throws IOException {
+
+        List<String> header = Arrays.asList( new String[]{ " ",  "Column0", "Column1", "Column2", "Column3"});
+        List<String> row0 = Arrays.asList( new String[]  {"Row0",   "1",       "2",       "10",        "4"} );
+        List<String> row1 = Arrays.asList( new String[]  {"Row1",   "5",       "6",       "1",        "8"} );
+        List<String> row2 = Arrays.asList( new String[]  {"Row2",   "9",       "10",     "10",       "12"} );
+        List<String> row3 = Arrays.asList( new String[]  {"Row3",   "19",       "10",     "0",       "12"} );
+        List<String> row4 = Arrays.asList( new String[]  {"Row4",   "90",       "10",     "10",       "12"} );
+
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );;
+
+        dataSet.addRow(header);
+        dataSet.addRow(row0);
+        dataSet.addRow(row1);
+        dataSet.addRow(row2);
+        dataSet.addRow(row3);
+        dataSet.addRow(row4);
+
+        dataSet.print();
+
+
+        Assertions.assertTrue(Arrays.asList( new String[]  {"1", "9", "90"} ).equals(dataSet.getColumnValuesByMatching("Column0", "Column2", "10")));
+        Assertions.assertTrue(Arrays.asList( new String[]  {"9", "19", "90"} ).equals(dataSet.getColumnValuesByMatching("Column0", "Column3", "12")));
+
+    }
+
+
+    /**
+     * Test a data matching recovery by row
+     */
+    @Test
+    void matchingRowValuesTest() throws IOException {
+
+        List<String> header = Arrays.asList( new String[]{ " ",  "Column0", "Column1", "Column2", "Column3"});
+        List<String> row0 = Arrays.asList( new String[]  {"Row0",   "1",       "2",       "10",        "4"} );
+        List<String> row1 = Arrays.asList( new String[]  {"Row1",   "5",       "6",       "1",        "8"} );
+        List<String> row2 = Arrays.asList( new String[]  {"Row2",   "9",       "10",     "10",       "12"} );
+        List<String> row3 = Arrays.asList( new String[]  {"Row3",   "19",       "10",     "0",       "12"} );
+        List<String> row4 = Arrays.asList( new String[]  {"Row4",   "90",       "10",     "10",       "12"} );
+
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );;
+
+        dataSet.addRow(header);
+        dataSet.addRow(row0);
+        dataSet.addRow(row1);
+        dataSet.addRow(row2);
+        dataSet.addRow(row3);
+        dataSet.addRow(row4);
+
+        dataSet.print();
+
+
+        Assertions.assertTrue(Arrays.asList( new String[]  {"2", "10"} ).equals(dataSet.getRowValuesByMatching("Row0", "Row4", "10")));
+
+    }
+
+
+
+
+
 }

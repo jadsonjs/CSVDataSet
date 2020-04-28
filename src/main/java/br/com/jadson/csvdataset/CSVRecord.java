@@ -397,8 +397,24 @@ class CSVRecord {
         return position;
     }
 
+    /**
+     * Return all values of a record ( row or column )
+     * @return
+     */
     public List<String> getValues() {
         return values;
+    }
+
+    /**
+     * Return all values of a record ( row or column ) for especific indexes
+     * @return
+     */
+    public List<String> getValues( List<Integer> indexes) {
+        List<String> filterValues = new ArrayList<>();
+        for (Integer index : indexes){
+            filterValues.add(values.get(index));
+        }
+        return filterValues;
     }
 
     public boolean containsValues() {

@@ -89,6 +89,36 @@ public class CSVDataSetAlgorithmTest {
 
 
     /**
+     * Test sub data matching recovery by row
+     */
+    @Test
+    void sumRowByMatchingTest() throws IOException {
+
+        List<String> header = Arrays.asList( new String[]{ " ",  "Column0", "Column1", "Column2", "Column3"});
+        List<String> row0 = Arrays.asList( new String[]  {"Row0",   "1",       "2",       "10",        "4"} );
+        List<String> row1 = Arrays.asList( new String[]  {"Row1",   "5",       "6",       "1",        "8"} );
+        List<String> row2 = Arrays.asList( new String[]  {"Row2",   "9",       "10",     "10",       "12"} );
+        List<String> row3 = Arrays.asList( new String[]  {"Row3",   "19",       "10",     "0",       "12"} );
+        List<String> row4 = Arrays.asList( new String[]  {"Row4",   "90",       "10",     "10",       "12"} );
+
+        CSVDataSet dataSet = new CSVDataSet( "temp.csv" );;
+
+        dataSet.addRow(header);
+        dataSet.addRow(row0);
+        dataSet.addRow(row1);
+        dataSet.addRow(row2);
+        dataSet.addRow(row3);
+        dataSet.addRow(row4);
+
+        dataSet.print();
+
+
+        Assertions.assertTrue( new BigDecimal("12").equals(dataSet.sumRowByMatching("Row0", "Row4", "10")));
+
+    }
+
+
+    /**
      * Test sum a row or a column
      */
     @Test
